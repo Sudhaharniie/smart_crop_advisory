@@ -1,0 +1,224 @@
+<!-- Feature Explanation Component -->
+<!-- Add this to your dashboard.html for each feature section -->
+
+<style>
+.feature-explanation {
+    background: #f8f9fa;
+    border-left: 4px solid #3498db;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.feature-explanation h4 {
+    color: #2c3e50;
+    margin: 0 0 10px 0;
+    display: flex;
+    align-items: center;
+}
+
+.feature-explanation h4 i {
+    margin-right: 10px;
+    color: #3498db;
+}
+
+.feature-explanation p {
+    margin: 5px 0;
+    color: #555;
+    font-size: 14px;
+}
+
+.feature-explanation .how-it-works {
+    background: white;
+    padding: 10px;
+    border-radius: 3px;
+    margin-top: 10px;
+    font-style: italic;
+}
+
+.info-icon {
+    cursor: pointer;
+    color: #3498db;
+    margin-left: 10px;
+}
+
+.collapsible-info {
+    display: none;
+    margin-top: 10px;
+}
+
+.collapsible-info.active {
+    display: block;
+}
+</style>
+
+<!-- Example: Weather Feature with Explanation -->
+<section id="weather" class="dashboard-section">
+    <div class="section-header">
+        <h2>
+            <i class="fas fa-cloud"></i> Weather Forecast
+            <i class="fas fa-info-circle info-icon" onclick="toggleInfo('weather-info')"></i>
+        </h2>
+    </div>
+    
+    <!-- Feature Explanation (collapsible) -->
+    <div id="weather-info" class="feature-explanation collapsible-info">
+        <h4><i class="fas fa-lightbulb"></i> What is this?</h4>
+        <p>Real-time weather data from OpenWeatherMap API showing temperature, humidity, rainfall, and 7-day forecast.</p>
+        
+        <div class="how-it-works">
+            <strong>How it works:</strong> Fetches live weather data for your location and provides irrigation recommendations based on forecast.
+        </div>
+    </div>
+    
+    <!-- Actual Weather Content -->
+    <div class="weather-card">
+        <p>Temperature: {{ weather.temperature }}°C</p>
+        <p>Humidity: {{ weather.humidity }}%</p>
+        <p>Rainfall: {{ weather.rainfall }}mm</p>
+    </div>
+</section>
+
+<!-- Example: Crop Recommendation with Explanation -->
+<section id="crop-recommendation" class="dashboard-section">
+    <div class="section-header">
+        <h2>
+            <i class="fas fa-seedling"></i> AI Crop Recommendation
+            <i class="fas fa-info-circle info-icon" onclick="toggleInfo('crop-info')"></i>
+        </h2>
+    </div>
+    
+    <div id="crop-info" class="feature-explanation collapsible-info">
+        <h4><i class="fas fa-lightbulb"></i> What is this?</h4>
+        <p>Machine Learning model recommends best crops based on soil nutrients (N, P, K), weather, and pH levels.</p>
+        
+        <div class="how-it-works">
+            <strong>How it works:</strong> Random Forest ML model analyzes 7 parameters (N, P, K, temperature, humidity, pH, rainfall) and predicts optimal crop with confidence score.
+        </div>
+    </div>
+    
+    <div class="crop-card">
+        <p>Recommended Crop: {{ crop_recommendations.recommended_crop }}</p>
+        <p>Confidence: {{ crop_recommendations.confidence }}%</p>
+    </div>
+</section>
+
+<!-- JavaScript for toggling explanations -->
+<script>
+function toggleInfo(id) {
+    const element = document.getElementById(id);
+    element.classList.toggle('active');
+}
+
+// Auto-show explanations on first visit
+document.addEventListener('DOMContentLoaded', function() {
+    if (!localStorage.getItem('explanations_seen')) {
+        // Show all explanations on first visit
+        document.querySelectorAll('.feature-explanation').forEach(el => {
+            el.classList.add('active');
+        });
+        localStorage.setItem('explanations_seen', 'true');
+    }
+});
+</script>
+
+<!-- Documentation Section at End of Dashboard -->
+<section id="documentation" class="dashboard-section">
+    <h2><i class="fas fa-book"></i> Documentation</h2>
+    
+    <div class="documentation-grid">
+        <!-- Overview -->
+        <div class="doc-card">
+            <h3><i class="fas fa-info-circle"></i> Overview</h3>
+            <p>AI-powered Agricultural Advisory System with 19 features including weather forecasting, crop recommendations, market prices, and more.</p>
+            <a href="/static/docs/PROJECT_DOCUMENTATION.txt" target="_blank" class="btn btn-primary">Read More</a>
+        </div>
+        
+        <!-- User Guide -->
+        <div class="doc-card">
+            <h3><i class="fas fa-user-guide"></i> User Guide</h3>
+            <p>Step-by-step instructions on how to use each feature, from registration to advanced operations.</p>
+            <a href="#user-guide" class="btn btn-primary">View Guide</a>
+        </div>
+        
+        <!-- Architecture -->
+        <div class="doc-card">
+            <h3><i class="fas fa-sitemap"></i> Architecture</h3>
+            <p>System architecture, data flow, component breakdown, and technology stack details.</p>
+            <a href="#architecture" class="btn btn-primary">View Architecture</a>
+        </div>
+        
+        <!-- Frontend -->
+        <div class="doc-card">
+            <h3><i class="fas fa-code"></i> Frontend</h3>
+            <p>HTML templates, CSS architecture, JavaScript modules, and responsive design documentation.</p>
+            <a href="#frontend" class="btn btn-primary">Frontend Docs</a>
+        </div>
+        
+        <!-- Backend -->
+        <div class="doc-card">
+            <h3><i class="fas fa-server"></i> Backend</h3>
+            <p>Flask application structure, business logic, ML models, and utility functions.</p>
+            <a href="#backend" class="btn btn-primary">Backend Docs</a>
+        </div>
+        
+        <!-- API Reference -->
+        <div class="doc-card">
+            <h3><i class="fas fa-plug"></i> API Reference</h3>
+            <p>Complete API documentation with endpoints, parameters, responses, and examples.</p>
+            <a href="#api-reference" class="btn btn-primary">API Docs</a>
+        </div>
+    </div>
+</section>
+
+<style>
+.documentation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.doc-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.doc-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.doc-card h3 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.doc-card h3 i {
+    color: #3498db;
+    margin-right: 10px;
+}
+
+.doc-card p {
+    color: #666;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.btn:hover {
+    background: #2980b9;
+}
+</style>
