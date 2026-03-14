@@ -1,0 +1,15 @@
+# Lines that need 4 more spaces of indentation (inside try block)
+# From line 560 onwards until "return render_template"
+
+Lines to fix:
+- crop_recommendations dict
+- predicted_yield
+- estimated_profit  
+- irrigation_advice
+- All sustainability code
+- All other dashboard data preparation
+- chart_data
+- return statement
+
+All need to be indented 4 more spaces to be inside the try block.
+Then add except block at the end before return.

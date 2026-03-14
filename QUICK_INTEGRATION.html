@@ -1,0 +1,126 @@
+<!-- ADD TO dashboard.html - QUICK INTEGRATION -->
+
+<!-- 1. AI CHATBOT - Add after existing chatbot section -->
+<script>
+function sendChat() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    if (!message) return;
+    
+    // Show user message
+    const chatContainer = document.getElementById('chatMessages');
+    chatContainer.innerHTML += `<div class="alert alert-secondary"><strong>You:</strong> ${message}</div>`;
+    
+    // Call advanced chatbot
+    fetch('/api/chatbot', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({question: message})
+    })
+    .then(r => r.json())
+    .then(data => {
+        chatContainer.innerHTML += `<div class="alert alert-info"><strong>AI:</strong> ${data.response.replace(/\n/g, '<br>')}</div>`;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    });
+    
+    input.value = '';
+}
+</script>
+
+<!-- 2. SATELLITE CROP HEALTH - Add new section -->
+<div class="row mb-4" id="satellite-health">
+    <div class="col-12">
+        <div class="card border-success" style="border-width: 3px;">
+            <div class="card-header bg-success text-white">
+                <h3><i class="fas fa-satellite"></i> Satellite Crop Health (NDVI)</h3>
+            </div>
+            <div class="card-body">
+                <button class="btn btn-success" onclick="loadSatelliteHealth()">
+                    <i class="fas fa-satellite-dish"></i> Scan Crop Health
+                </button>
+                <div id="satelliteResults" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function loadSatelliteHealth() {
+    document.getElementById('satelliteResults').innerHTML = '<div class="spinner-border"></div> Analyzing...';
+    
+    fetch('/api/satellite/crop-health', {method: 'POST'})
+    .then(r => r.json())
+    .then(data => {
+        const d = data.data;
+        document.getElementById('satelliteResults').innerHTML = `
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card text-center" style="background: ${d.color}; color: white;">
+                        <div class="card-body">
+                            <h1>${d.icon}</h1>
+                            <h3>NDVI: ${d.ndvi_value}</h3>
+                            <h5>${d.health_status}</h5>
+                            <p>Health Score: ${d.health_score}/100</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <h5>Recommendations:</h5>
+                    <ul>
+                        ${d.recommendations.map(r => `<li>${r}</li>`).join('')}
+                    </ul>
+                    <p><strong>Estimated Biomass:</strong> ${d.estimated_biomass_kg} kg</p>
+                    <p><strong>Chlorophyll Index:</strong> ${d.chlorophyll_index}</p>
+                </div>
+            </div>
+        `;
+    });
+}
+</script>
+
+<!-- 3. CROP CALENDAR - Add new section -->
+<div class="row mb-4" id="crop-calendar-section">
+    <div class="col-12">
+        <div class="card border-primary" style="border-width: 3px;">
+            <div class="card-header bg-primary text-white">
+                <h3><i class="fas fa-calendar-alt"></i> Crop Calendar - This Month</h3>
+            </div>
+            <div class="card-body" id="calendarContent">
+                <button class="btn btn-primary" onclick="loadCropCalendar()">
+                    <i class="fas fa-calendar"></i> Load Calendar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function loadCropCalendar() {
+    fetch('/api/crop-calendar')
+    .then(r => r.json())
+    .then(data => {
+        const d = data.data;
+        document.getElementById('calendarContent').innerHTML = `
+            <h4>${d.season} - ${d.temperature}</h4>
+            <h5>Activities This Month:</h5>
+            <ul>
+                ${d.activities.map(a => `<li>${a}</li>`).join('')}
+            </ul>
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <h6>Crops to Monitor:</h6>
+                    <ul>${d.crops_to_monitor.map(c => `<li>${c}</li>`).join('')}</ul>
+                </div>
+                <div class="col-md-4">
+                    <h6>Harvesting:</h6>
+                    <ul>${d.harvesting.length ? d.harvesting.map(c => `<li>${c}</li>`).join('') : '<li>None</li>'}</ul>
+                </div>
+                <div class="col-md-4">
+                    <h6>Sowing:</h6>
+                    <ul>${d.sowing.length ? d.sowing.map(c => `<li>${c}</li>`).join('') : '<li>None</li>'}</ul>
+                </div>
+            </div>
+        `;
+    });
+}
+</script>

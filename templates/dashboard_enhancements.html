@@ -1,0 +1,52 @@
+<!-- Add this to your dashboard.html navigation -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="btn-group mb-3" role="group">
+                <a href="/dashboard" class="btn btn-success"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="/model-performance" class="btn btn-primary"><i class="fas fa-chart-line"></i> Model Performance</a>
+                <a href="/prediction-history" class="btn btn-info"><i class="fas fa-history"></i> History</a>
+                <a href="/crop-comparison" class="btn btn-warning"><i class="fas fa-balance-scale"></i> Compare Crops</a>
+                <a href="/risk-analysis" class="btn btn-danger"><i class="fas fa-exclamation-triangle"></i> Risk Analysis</a>
+                <a href="/data-sources" class="btn btn-secondary"><i class="fas fa-database"></i> Data Sources</a>
+                <a href="/documentation" class="btn btn-dark"><i class="fas fa-book"></i> Docs</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Smart Recommendations Section - Add this to dashboard.html -->
+<div class="card mb-4">
+    <div class="card-header bg-success text-white">
+        <h5><i class="fas fa-lightbulb"></i> Smart Recommendations</h5>
+    </div>
+    <div class="card-body">
+        {% if smart_recommendations %}
+        <div class="row">
+            {% for rec in smart_recommendations %}
+            <div class="col-md-6 mb-3">
+                <div class="alert alert-{% if rec.priority == 'High' %}danger{% elif rec.priority == 'Medium' %}warning{% else %}info{% endif %}">
+                    <h6><i class="fas fa-{{ rec.icon }}"></i> {{ rec.category }}: {{ rec.issue }}</h6>
+                    <p><strong>Action:</strong> {{ rec.recommendation }}</p>
+                    <span class="badge bg-dark">Priority: {{ rec.priority }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted">No immediate actions required. All parameters are optimal.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Export Options - Add this to dashboard.html -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5><i class="fas fa-download"></i> Export & Reports</h5>
+    </div>
+    <div class="card-body">
+        <a href="/generate_report" class="btn btn-success"><i class="fas fa-file-pdf"></i> Download PDF Report</a>
+        <a href="/api/analytics/export" class="btn btn-info"><i class="fas fa-file-csv"></i> Export Analytics CSV</a>
+        <button class="btn btn-warning" onclick="window.print()"><i class="fas fa-print"></i> Print Dashboard</button>
+    </div>
+</div>

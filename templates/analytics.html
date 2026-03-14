@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="fas fa-chart-line"></i> Analytics Dashboard</h2>
+            <p class="text-muted">Historical data and insights for your farm</p>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card metric-card metric-profit">
+                <div class="card-body">
+                    <div class="metric-top">
+                        <span class="metric-label">Total Income</span>
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                    <h3 class="metric-value">₹{{ "{:,.0f}".format(total_income) }}</h3>
+                    <p class="metric-sub">Last 12 months</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card metric-card metric-yield">
+                <div class="card-body">
+                    <div class="metric-top">
+                        <span class="metric-label">Total Expenses</span>
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <h3 class="metric-value">₹{{ "{:,.0f}".format(total_expenses) }}</h3>
+                    <p class="metric-sub">Last 12 months</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card metric-card metric-confidence">
+                <div class="card-body">
+                    <div class="metric-top">
+                        <span class="metric-label">Net Profit</span>
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="metric-value">₹{{ "{:,.0f}".format(net_profit) }}</h3>
+                    <p class="metric-sub">ROI: {{ roi }}%</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card metric-card metric-crop">
+                <div class="card-body">
+                    <div class="metric-top">
+                        <span class="metric-label">Growth Rate</span>
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <h3 class="metric-value">{{ growth_rate }}%</h3>
+                    <p class="metric-sub">Last 3 months</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Income vs Expense Trend -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-area"></i> Income vs Expense Trend</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-panel chart-panel-lg">
+                        <canvas id="incomeExpenseChart" data-chart="true"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profit Trend & Category Breakdown -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-line-chart"></i> Monthly Profit Trend</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-panel">
+                        <canvas id="profitTrendChart" data-chart="true"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-pie-chart"></i> Expense Breakdown</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-panel">
+                        <canvas id="categoryChart" data-chart="true"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Disease Trends & Summary Stats -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-bug"></i> Disease Detection Trends</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-panel">
+                        <canvas id="diseaseTrendChart" data-chart="true"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Summary Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <tbody>
+                            <tr>
+                                <td><strong>Average Monthly Profit</strong></td>
+                                <td class="text-end">₹{{ "{:,.2f}".format(avg_monthly_profit) }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Return on Investment (ROI)</strong></td>
+                                <td class="text-end">{{ roi }}%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total Diseases Detected</strong></td>
+                                <td class="text-end">{{ total_diseases_detected }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Crops Planted</strong></td>
+                                <td class="text-end">{{ crops_planted }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Growth Rate (3 months)</strong></td>
+                                <td class="text-end">
+                                    <span class="badge {% if growth_rate > 0 %}bg-success{% elif growth_rate < 0 %}bg-danger{% else %}bg-secondary{% endif %}">
+                                        {{ growth_rate }}%
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="mt-3">
+                        <a href="{{ url_for('export_analytics') }}" class="btn btn-primary w-100">
+                            <i class="fas fa-download"></i> Export Data (CSV)
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Analytics Chart Data
+const analyticsData = {
+    months: {{ months | tojson }},
+    income: {{ income_data | tojson }},
+    expense: {{ expense_data | tojson }},
+    profit: {{ profit_data | tojson }},
+    categories: {{ category_expenses | tojson }},
+    diseases: {{ disease_trends | tojson }}
+};
+
+// Income vs Expense Chart
+const incomeExpenseCtx = document.getElementById('incomeExpenseChart').getContext('2d');
+new Chart(incomeExpenseCtx, {
+    type: 'line',
+    data: {
+        labels: analyticsData.months,
+        datasets: [{
+            label: 'Income',
+            data: analyticsData.income,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true,
+            tension: 0.4
+        }, {
+            label: 'Expense',
+            data: analyticsData.expense,
+            borderColor: '#ef4444',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'top' }
+        }
+    }
+});
+
+// Profit Trend Chart
+const profitTrendCtx = document.getElementById('profitTrendChart').getContext('2d');
+new Chart(profitTrendCtx, {
+    type: 'bar',
+    data: {
+        labels: analyticsData.months,
+        datasets: [{
+            label: 'Monthly Profit',
+            data: analyticsData.profit,
+            backgroundColor: analyticsData.profit.map(v => v >= 0 ? 'rgba(16, 185, 129, 0.8)' : 'rgba(239, 68, 68, 0.8)'),
+            borderRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false }
+        }
+    }
+});
+
+// Category Breakdown Chart
+const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+new Chart(categoryCtx, {
+    type: 'doughnut',
+    data: {
+        labels: Object.keys(analyticsData.categories),
+        datasets: [{
+            data: Object.values(analyticsData.categories),
+            backgroundColor: ['#4ade80', '#fbbf24', '#60a5fa', '#a78bfa', '#f87171', '#34d399']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'bottom' }
+        }
+    }
+});
+
+// Disease Trend Chart
+const diseaseTrendCtx = document.getElementById('diseaseTrendChart').getContext('2d');
+const diseaseMonths = Object.keys(analyticsData.diseases);
+const diseaseCounts = Object.values(analyticsData.diseases);
+
+new Chart(diseaseTrendCtx, {
+    type: 'line',
+    data: {
+        labels: diseaseMonths,
+        datasets: [{
+            label: 'Diseases Detected',
+            data: diseaseCounts,
+            borderColor: '#ef4444',
+            backgroundColor: 'rgba(239, 68, 68, 0.2)',
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false }
+        }
+    }
+});
+</script>
+{% endblock %}

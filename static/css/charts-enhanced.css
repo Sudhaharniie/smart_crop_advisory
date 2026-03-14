@@ -1,0 +1,49 @@
+/* Chart Container Sizes - Bigger for Better Visibility */
+.chart-container {
+    position: relative;
+    height: 450px !important;
+    min-height: 450px;
+    width: 100%;
+    padding: 20px;
+}
+
+canvas {
+    max-height: 450px !important;
+}
+
+/* Larger cards for charts */
+.card.chart-card {
+    min-height: 550px;
+}
+
+.card.chart-card .card-body {
+    padding: 30px;
+    min-height: 480px;
+}
+
+/* Dashboard grid with bigger charts */
+.dashboard-grid .card {
+    min-height: 550px;
+}
+
+/* Responsive chart sizes */
+@media (max-width: 768px) {
+    .chart-container {
+        height: 350px !important;
+        min-height: 350px;
+    }
+    
+    canvas {
+        max-height: 350px !important;
+    }
+}
+
+/* Dark mode chart backgrounds */
+body.dark-mode canvas {
+    background: transparent;
+}
+
+body.dark-mode .card {
+    background: var(--card-bg);
+    color: var(--text-dark);
+}

@@ -1,0 +1,66 @@
+# Core Flask
+Flask==2.3.0
+Flask-SQLAlchemy==3.0.0
+Werkzeug==2.3.0
+
+# Database
+SQLAlchemy==2.0.0
+
+# Security
+python-dotenv==1.0.0
+
+# HTTP Requests & APIs
+requests==2.31.0
+
+# Data Processing
+pandas==2.0.0
+numpy==1.24.0
+
+# Machine Learning
+scikit-learn==1.3.0
+joblib==1.3.0
+
+# Deep Learning (Optional - for disease detection)
+tensorflow==2.13.0
+# OR use tensorflow-cpu for smaller size:
+# tensorflow-cpu==2.13.0
+
+# Image Processing
+Pillow==10.0.0
+opencv-python==4.8.0
+
+# Location Services
+geopy==2.3.0
+
+# SMS Service
+twilio==8.5.0
+
+# PDF Generation
+reportlab==4.0.0
+
+# Text-to-Speech
+gTTS==2.3.0
+
+# Date/Time
+python-dateutil==2.8.2
+
+# Web Scraping (for fallback data)
+beautifulsoup4==4.12.0
+lxml==4.9.0
+
+# Logging
+colorlog==6.7.0
+
+# Testing
+pytest==7.4.0
+pytest-flask==1.2.0
+
+# Development
+black==23.7.0
+flake8==6.1.0
+
+# Production Server
+gunicorn==21.2.0
+
+# Environment
+python-decouple==3.8

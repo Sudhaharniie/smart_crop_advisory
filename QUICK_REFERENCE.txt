@@ -1,0 +1,62 @@
+================================================================================
+QUICK REFERENCE: 5 NEW DYNAMIC FEATURES
+================================================================================
+
+FEATURE 1: SMS/WhatsApp Alerts
+-------------------------------
+POST /api/alerts/send              - Send alert
+GET  /api/alerts/history           - View history
+POST /api/alerts/auto-generate     - Auto-create alerts
+
+FEATURE 2: Community Marketplace
+---------------------------------
+GET  /api/marketplace/listings     - Browse listings
+POST /api/marketplace/create       - Create listing
+GET  /api/marketplace/my-listings  - My listings
+POST /api/marketplace/close/:id    - Close listing
+
+FEATURE 3: Disease Detection
+-----------------------------
+POST /api/disease/detect           - Upload & detect
+GET  /api/disease/history          - Detection history
+POST /api/disease/resolve/:id      - Mark resolved
+
+FEATURE 4: Loan & Insurance
+----------------------------
+GET  /api/loan/eligibility         - Check eligibility
+POST /api/loan/apply               - Apply for loan
+GET  /api/loan/history             - Loan history
+GET  /api/insurance/plans          - View plans
+POST /api/insurance/apply          - Apply insurance
+GET  /api/insurance/my-policies    - My policies
+
+FEATURE 5: Video Learning
+--------------------------
+GET  /api/videos/library           - Browse videos
+POST /api/videos/watch/:id         - Watch video
+POST /api/videos/progress/:id      - Update progress
+GET  /api/videos/my-progress       - Watch history
+POST /api/videos/like/:id          - Like video
+
+================================================================================
+INTEGRATION CHECKLIST
+================================================================================
+
+[ ] 1. Copy models from new_features.py to app.py
+[ ] 2. Copy routes from new_routes.py to app.py
+[ ] 3. Copy helper functions from new_features.py to app.py
+[ ] 4. Run: python add_sample_data.py
+[ ] 5. Restart Flask app
+[ ] 6. Test APIs using Postman/curl
+[ ] 7. Update frontend to use new APIs
+
+================================================================================
+FILES TO USE
+================================================================================
+
+new_features.py      - Models & helper functions (copy to app.py)
+new_routes.py        - API routes (copy to app.py)
+add_sample_data.py   - Run to add sample data
+NEW_FEATURES_GUIDE.txt - Complete documentation
+
+================================================================================

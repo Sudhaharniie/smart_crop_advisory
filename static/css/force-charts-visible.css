@@ -1,0 +1,57 @@
+/* FORCE ALL CHARTS TO BE VISIBLE */
+
+/* Make all canvas elements visible */
+canvas {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    height: 400px !important;
+    background: #ffffff !important;
+}
+
+/* Specific chart IDs */
+#profitComparisonChart,
+#sustainabilityChart,
+#weatherChart,
+#weatherOverviewChart,
+#soilNutrientsChart,
+#marketTrendsChart,
+#soilChart {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-height: 400px !important;
+}
+
+/* Chart containers */
+.chart-panel {
+    display: block !important;
+    visibility: visible !important;
+    min-height: 450px !important;
+    position: relative !important;
+}
+
+/* Remove skeleton after load */
+.chart-panel.ready .chart-skeleton {
+    display: none !important;
+}
+
+/* Dark mode charts */
+body.theme-dark canvas {
+    background: #1a2838 !important;
+    border: 2px solid #4a90e2 !important;
+}
+
+/* Force chart parent containers to be visible */
+.card-body {
+    display: block !important;
+    visibility: visible !important;
+}
+
+/* Ensure chart.js renders */
+canvas[data-chart="true"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
