@@ -1,0 +1,163 @@
+================================================================================
+SCROLL SPY INTEGRATION GUIDE
+Auto-highlight sidebar navigation as you scroll
+================================================================================
+
+WHAT IS SCROLL SPY?
+-------------------
+When you scroll down the page, the left sidebar automatically highlights which
+section you're currently viewing. For example:
+- Scroll to "Crop Recommendation" → Sidebar highlights "Crop Recommendation"
+- Scroll to "Market Prices" → Sidebar highlights "Market Prices"
+
+================================================================================
+STEP 1: Add Files to Your Project
+================================================================================
+
+Files created:
+✓ static/js/scroll-spy.js - JavaScript for scroll detection
+✓ static/css/scroll-spy.css - Styling for active states
+✓ templates/dashboard_with_scrollspy.html - Example template
+
+================================================================================
+STEP 2: Update Your Dashboard HTML
+================================================================================
+
+In your dashboard.html (or dashboard_new.html), add these changes:
+
+1. ADD CSS in <head> section:
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/scroll-spy.css') }}">
+
+2. ADD JavaScript before </body>:
+   <script src="{{ url_for('static', filename='js/scroll-spy.js') }}"></script>
+
+3. STRUCTURE your HTML like this:
+
+   <!-- Sidebar -->
+   <div class="sidebar">
+       <nav>
+           <a href="#weather">Weather</a>
+           <a href="#crop-recommendation">Crop Recommendation</a>
+           <a href="#soil-analysis">Soil Analysis</a>
+           <a href="#market-prices">Market Prices</a>
+           <!-- Add more links -->
+       </nav>
+   </div>
+
+   <!-- Main Content -->
+   <div class="main-content">
+       <section id="weather">
+           <!-- Weather content -->
+       </section>
+       
+       <section id="crop-recommendation">
+           <!-- Crop recommendation content -->
+       </section>
+       
+       <section id="soil-analysis">
+           <!-- Soil analysis content -->
+       </section>
+       
+       <!-- Add more sections -->
+   </div>
+
+================================================================================
+STEP 3: Add IDs to Your Sections
+================================================================================
+
+Make sure each section has an ID that matches the sidebar link:
+
+Sidebar Link:           Section ID:
+<a href="#weather">     <section id="weather">
+<a href="#crop">        <section id="crop">
+<a href="#soil">        <section id="soil">
+
+Example:
+<section id="crop-recommendation" class="dashboard-section">
+    <h2>Crop Recommendation</h2>
+    <p>Recommended Crop: {{ crop_recommendations.recommended_crop }}</p>
+</section>
+
+================================================================================
+STEP 4: Test It!
+================================================================================
+
+1. Restart your Flask app
+2. Open dashboard
+3. Scroll down the page
+4. Watch the sidebar automatically highlight the current section!
+
+================================================================================
+CUSTOMIZATION
+================================================================================
+
+Change highlight color (in scroll-spy.css):
+.sidebar a.active {
+    border-left: 3px solid #3498db;  /* Change this color */
+    color: #3498db;                   /* And this color */
+}
+
+Change scroll offset (in scroll-spy.js):
+const offset = 100;  /* Change this number */
+
+================================================================================
+QUICK COPY-PASTE FOR YOUR DASHBOARD
+================================================================================
+
+1. In <head> section, add:
+<link rel="stylesheet" href="{{ url_for('static', filename='css/scroll-spy.css') }}">
+
+2. Before </body>, add:
+<script src="{{ url_for('static', filename='js/scroll-spy.js') }}"></script>
+
+3. Wrap your sidebar in:
+<div class="sidebar">
+    <nav>
+        <a href="#section1">Section 1</a>
+        <a href="#section2">Section 2</a>
+    </nav>
+</div>
+
+4. Wrap your content in:
+<div class="main-content">
+    <section id="section1">Content 1</section>
+    <section id="section2">Content 2</section>
+</div>
+
+================================================================================
+EXAMPLE SECTION IDS FOR YOUR DASHBOARD
+================================================================================
+
+Use these IDs in your sections:
+- weather
+- crop-recommendation
+- soil-analysis
+- market-prices
+- irrigation
+- sustainability
+- expenses
+- equipment
+- labor
+- notifications
+- govt-schemes
+- fertilizer
+- storage-tips
+- helplines
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Sidebar not highlighting?
+→ Check if section IDs match sidebar href values
+→ Make sure scroll-spy.js is loaded (check browser console)
+
+Sidebar not scrolling?
+→ Add overflow-y: auto to .sidebar in CSS
+
+Sections jumping when clicked?
+→ Adjust scroll-margin-top in CSS
+
+================================================================================
+DONE! Your sidebar will now auto-highlight as you scroll!
+================================================================================

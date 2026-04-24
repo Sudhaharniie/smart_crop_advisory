@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Analysis - Smart Crop Advisory</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .card { border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 20px; }
+        .risk-low { background: #28a745; color: white; padding: 10px; border-radius: 10px; }
+        .risk-medium { background: #ffc107; color: black; padding: 10px; border-radius: 10px; }
+        .risk-high { background: #dc3545; color: white; padding: 10px; border-radius: 10px; }
+        .risk-score { font-size: 3rem; font-weight: bold; text-align: center; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/dashboard"><i class="fas fa-leaf"></i> Smart Crop Advisory</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/risk-analysis">Risk Analysis</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 class="text-white mb-4"><i class="fas fa-exclamation-triangle"></i> Comprehensive Risk Analysis</h2>
+
+        <!-- Overall Risk -->
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>Overall Risk Level</h3>
+                <div class="risk-{{ overall_risk.level.lower() }}">
+                    <div class="risk-score">{{ overall_risk.score }}/100</div>
+                    <h4>{{ overall_risk.level }} Risk</h4>
+                    <p>{{ overall_risk.message }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Individual Risk Categories -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5><i class="fas fa-cloud"></i> Weather Risk</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="risk-{{ weather_risk.overall.risk.lower() }}">
+                            <strong>{{ weather_risk.overall.risk }}</strong> - Score: {{ weather_risk.overall.score }}
+                        </div>
+                        <hr>
+                        <p><strong>Drought:</strong> {{ weather_risk.drought.risk }} ({{ weather_risk.drought.rainfall_7day }}mm)</p>
+                        <p><strong>Flood:</strong> {{ weather_risk.flood.risk }}</p>
+                        <p><strong>Heat:</strong> {{ weather_risk.heat.risk }} ({{ weather_risk.heat.max_temp }}°C)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h5><i class="fas fa-seedling"></i> Soil Risk</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="risk-{{ soil_risk.level.lower() }}">
+                            <strong>{{ soil_risk.level }}</strong> - Score: {{ soil_risk.score }}
+                        </div>
+                        <hr>
+                        <ul>
+                            {% for issue in soil_risk.issues %}
+                            <li>{{ issue }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        <h5><i class="fas fa-bug"></i> Pest & Disease Risk</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="risk-{{ pest_risk.level.lower() }}">
+                            <strong>{{ pest_risk.level }}</strong> - Score: {{ pest_risk.score }}
+                        </div>
+                        <hr>
+                        <p>Recent diseases detected: {{ pest_risk.recent_diseases }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5><i class="fas fa-rupee-sign"></i> Financial Risk</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="risk-{{ financial_risk.level.lower() }}">
+                            <strong>{{ financial_risk.level }}</strong> - Score: {{ financial_risk.score }}
+                        </div>
+                        <hr>
+                        <p>Income: ₹{{ financial_risk.income }}</p>
+                        <p>Expenses: ₹{{ financial_risk.expense }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

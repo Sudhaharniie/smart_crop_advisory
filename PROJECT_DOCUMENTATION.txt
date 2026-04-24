@@ -1,0 +1,823 @@
+================================================================================
+AGRICULTURAL ADVISORY SYSTEM - COMPLETE DOCUMENTATION
+================================================================================
+
+TABLE OF CONTENTS
+-----------------
+1. Overview
+2. User Guide
+3. System Architecture
+4. Frontend Documentation
+5. Backend Documentation
+6. API Reference
+7. Database Schema
+8. Deployment Guide
+
+================================================================================
+1. OVERVIEW
+================================================================================
+
+PROJECT NAME: Agricultural Advisory System
+VERSION: 1.0
+PURPOSE: AI-powered platform to help farmers make data-driven decisions
+
+KEY FEATURES:
+- Real-time weather forecasting
+- ML-based crop recommendations
+- Yield prediction and profit estimation
+- Soil health analysis
+- Live market prices
+- Smart irrigation scheduling
+- Expense tracking
+- Equipment rental marketplace
+- Labor management
+- Disease detection
+- Loan & insurance integration
+- Video learning library
+- Multilingual support (8 languages)
+
+TECHNOLOGY STACK:
+- Backend: Python 3.x, Flask 2.3.3
+- Database: SQLite (SQLAlchemy ORM)
+- ML Models: scikit-learn, Random Forest
+- Frontend: HTML5, CSS3, JavaScript
+- APIs: OpenWeatherMap, Government Mandi API
+- Text-to-Speech: Google gTTS
+
+TARGET USERS:
+- Small and medium farmers
+- Agricultural cooperatives
+- Farm managers
+- Agricultural students
+
+================================================================================
+2. USER GUIDE
+================================================================================
+
+2.1 GETTING STARTED
+-------------------
+
+REGISTRATION:
+1. Open http://localhost:5000
+2. Click "Register"
+3. Enter: username, email, password, farm size, location, phone
+4. Click "Submit"
+5. You'll be automatically logged in
+
+LOGIN:
+1. Enter username and password
+2. Click "Login"
+3. Dashboard will load with personalized data
+
+2.2 DASHBOARD FEATURES
+----------------------
+
+WEATHER FORECAST:
+- View current temperature, humidity, rainfall
+- See 7-day forecast
+- Get weather-based farming advice
+
+CROP RECOMMENDATION:
+- System analyzes your soil and weather
+- Recommends best crop with confidence %
+- Shows expected yield and profit
+
+SOIL ANALYSIS:
+- View pH, N, P, K, moisture levels
+- Get recommendations for soil improvement
+- Update soil data anytime
+
+MARKET PRICES:
+- Live prices for 50+ crops
+- Price trends (up/down/stable)
+- Compare with last week's prices
+
+IRRIGATION SCHEDULE:
+- Smart schedule based on weather
+- Considers soil moisture
+- Recommends drip/sprinkler irrigation
+
+EXPENSE TRACKER:
+- Add income (crop sales)
+- Add expenses (seeds, fertilizer, labor)
+- View net profit
+- Track transaction history
+
+EQUIPMENT RENTAL:
+- Browse available equipment
+- See rates and distance
+- Book equipment online
+
+LABOR MANAGEMENT:
+- Add workers with wages
+- Assign tasks
+- Track daily wages
+- Monitor attendance
+
+2.3 ADVANCED FEATURES
+---------------------
+
+DISEASE DETECTION:
+1. Take photo of diseased leaf
+2. Upload via /api/pest_detection
+3. Get disease name and treatment
+
+VIDEO LEARNING:
+1. Browse video library
+2. Filter by category/language
+3. Track watch progress
+4. Like helpful videos
+
+LOAN APPLICATION:
+1. Check eligibility
+2. Apply for Kisan Credit Card
+3. Track application status
+
+INSURANCE:
+1. Compare plans
+2. Apply for crop insurance
+3. View active policies
+
+================================================================================
+3. SYSTEM ARCHITECTURE
+================================================================================
+
+3.1 HIGH-LEVEL ARCHITECTURE
+---------------------------
+
+┌─────────────────────────────────────────────────────────────┐
+│                        USER INTERFACE                       │
+│              (HTML/CSS/JavaScript Dashboard)                │
+└────────────────────────┬────────────────────────────────────┘
+                         │
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    FLASK WEB SERVER                         │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
+│  │   Routes     │  │  Business    │  │   Utils      │     │
+│  │  (app.py)    │  │   Logic      │  │ (utils.py)   │     │
+│  └──────────────┘  └──────────────┘  └──────────────┘     │
+└────────────────────────┬────────────────────────────────────┘
+                         │
+         ┌───────────────┼───────────────┐
+         ↓               ↓               ↓
+┌─────────────┐  ┌─────────────┐  ┌─────────────┐
+│  DATABASE   │  │  ML MODELS  │  │ EXTERNAL    │
+│  (SQLite)   │  │  (pkl files)│  │ APIs        │
+│             │  │             │  │             │
+│ 16 Tables   │  │ - Crop Rec  │  │ - Weather   │
+│ SQLAlchemy  │  │ - Yield     │  │ - Market    │
+└─────────────┘  └─────────────┘  └─────────────┘
+
+3.2 DATA FLOW
+-------------
+
+USER REQUEST → Flask Route → Business Logic → Database/ML/API
+                                                      ↓
+USER RESPONSE ← Template Rendering ← Data Processing ←
+
+3.3 COMPONENT BREAKDOWN
+-----------------------
+
+FRONTEND:
+- templates/ - HTML templates (Jinja2)
+- static/css/ - Stylesheets
+- static/js/ - JavaScript files
+- static/images/ - Images and icons
+
+BACKEND:
+- app.py - Main Flask application (900+ lines)
+- utils.py - Validation, error handling, logging
+- config.py - Configuration settings
+- feature_explanations.py - Feature descriptions
+
+ML MODELS:
+- model.pkl - Crop recommendation (Random Forest)
+- yield_model.pkl - Yield prediction (Random Forest)
+
+DATABASE:
+- instance/crop_advisory.db - SQLite database
+- 16 tables with relationships
+
+EXTERNAL SERVICES:
+- OpenWeatherMap API - Weather data
+- Government Mandi API - Market prices
+- Google gTTS - Text-to-speech
+
+================================================================================
+4. FRONTEND DOCUMENTATION
+================================================================================
+
+4.1 TEMPLATE STRUCTURE
+----------------------
+
+BASE TEMPLATE (base.html):
+- Common header, footer, navigation
+- CSS/JS includes
+- Flash message display
+
+DASHBOARD (dashboard.html):
+- Main user interface
+- 15+ sections
+- Charts and visualizations
+- Real-time data display
+
+LOGIN (login.html):
+- Login form
+- Registration form
+- Password validation
+
+4.2 CSS ARCHITECTURE
+--------------------
+
+style.css:
+- Global styles
+- Component styles
+- Responsive design
+- Color scheme: #2c3e50, #3498db, #27ae60
+
+scroll-spy.css:
+- Sidebar navigation
+- Active state highlighting
+- Smooth scrolling
+
+4.3 JAVASCRIPT MODULES
+----------------------
+
+dashboard.js:
+- Dashboard initialization
+- Data fetching
+- Event handlers
+
+charts.js:
+- Chart.js integration
+- Soil nutrients chart
+- Weather forecast chart
+- Market trends chart
+
+scroll-spy.js:
+- Auto-highlight navigation
+- Smooth scrolling
+- Section detection
+
+voice.js:
+- Text-to-speech
+- Language selection
+- Audio playback
+
+language.js:
+- Multilingual support
+- Translation switching
+- 8 languages supported
+
+4.4 RESPONSIVE DESIGN
+---------------------
+
+BREAKPOINTS:
+- Desktop: > 1200px
+- Tablet: 768px - 1199px
+- Mobile: < 768px
+
+MOBILE FEATURES:
+- Hamburger menu
+- Touch-friendly buttons
+- Collapsible sections
+- Optimized images
+
+================================================================================
+5. BACKEND DOCUMENTATION
+================================================================================
+
+5.1 FLASK APPLICATION (app.py)
+-------------------------------
+
+INITIALIZATION:
+```python
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'your-secret-key'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///crop_advisory.db'
+db = SQLAlchemy(app)
+```
+
+MODELS (16 total):
+1. User - User accounts
+2. CropData - Crop information
+3. WeatherData - Weather history
+4. Expense - Income/expense tracking
+5. Worker - Labor management
+6. SoilData - Soil parameters
+7. Equipment - Equipment rental
+8. Notification - User notifications
+9. Alert - SMS/WhatsApp alerts
+10. MarketplaceListing - Community marketplace
+11. DiseaseDetection - Disease history
+12. LoanApplication - Loan tracking
+13. Insurance - Insurance policies
+14. VideoLibrary - Video content
+15. VideoProgress - Watch history
+
+ROUTES (40+ endpoints):
+- Authentication: /, /login, /register, /logout
+- Dashboard: /dashboard
+- API: /api/* (20+ endpoints)
+- Pages: /crops, /weather, /market, /soil, etc.
+
+5.2 BUSINESS LOGIC
+------------------
+
+WEATHER INTEGRATION:
+```python
+def get_weather_data(location):
+    # Fetch from OpenWeatherMap API
+    # Calculate rainfall
+    # Get 7-day forecast
+    return weather, forecast
+```
+
+CROP RECOMMENDATION:
+```python
+def recommend_crops(N, P, K, temp, humidity, ph, rainfall):
+    # Load ML model
+    # Prepare features
+    # Predict crop
+    # Calculate confidence
+    return crop, confidence
+```
+
+YIELD PREDICTION:
+```python
+def predict_yield(crop_name, weather):
+    # Encode crop
+    # Prepare features
+    # Predict yield
+    return yield_value
+```
+
+5.3 UTILITIES (utils.py)
+------------------------
+
+VALIDATION:
+- Email validation (regex)
+- Phone validation (Indian format)
+- Number validation (range checking)
+- Soil data validation
+- Expense validation
+
+ERROR HANDLING:
+- ValidationError - Input errors
+- APIError - External API failures
+- handle_errors decorator
+- Logging to file
+
+SECURITY:
+- Password hashing (Werkzeug)
+- Session management
+- Input sanitization
+- Rate limiting
+- SQL injection prevention
+
+5.4 ML MODELS
+-------------
+
+CROP RECOMMENDATION MODEL:
+- Algorithm: Random Forest Classifier
+- Features: N, P, K, temperature, humidity, pH, rainfall
+- Output: Crop name + confidence %
+- Training: 2200+ samples
+- Accuracy: 95%+
+
+YIELD PREDICTION MODEL:
+- Algorithm: Random Forest Regressor
+- Features: Crop code, rainfall, fertilizer, pesticide
+- Output: Yield in kg/hectare
+- Training: Historical yield data
+- Accuracy: 85%+
+
+================================================================================
+6. API REFERENCE
+================================================================================
+
+6.1 AUTHENTICATION APIs
+-----------------------
+
+POST /register
+Body: {username, email, password, farm_size, location, phone}
+Response: Redirect to dashboard
+Description: Create new user account
+
+POST /login
+Body: {username, password}
+Response: Redirect to dashboard
+Description: User login
+
+GET /logout
+Response: Redirect to login
+Description: User logout
+
+6.2 DASHBOARD APIs
+------------------
+
+GET /dashboard
+Auth: Required
+Response: HTML dashboard
+Description: Main dashboard with all data
+
+GET /api/crop_monitoring
+Auth: Required
+Response: {growth_stage, days_since_planting, health_score, ...}
+Description: Crop growth data
+
+GET /api/sustainability_metrics
+Response: {water_conservation, carbon_footprint, biodiversity, ...}
+Description: Sustainability metrics
+
+6.3 DATA MANAGEMENT APIs
+------------------------
+
+POST /api/update_soil
+Auth: Required
+Body: {ph, nitrogen, phosphorus, potassium, moisture}
+Response: {success: true, message: "Soil data updated"}
+Description: Update soil parameters
+
+POST /api/add_expense
+Auth: Required
+Body: {type, description, amount, category}
+Response: {success: true, message: "Transaction added"}
+Description: Add income/expense
+
+POST /api/add_worker
+Auth: Required
+Body: {name, phone, daily_wage, task}
+Response: {success: true, message: "Worker added"}
+Description: Add new worker
+
+POST /api/add_notification
+Auth: Required
+Body: {title, message, icon, color}
+Response: {success: true, message: "Notification created"}
+Description: Create notification
+
+6.4 AI/ML APIs
+--------------
+
+POST /api/pest_detection
+Auth: Optional
+Body: multipart/form-data {image: file}
+Response: {disease, confidence, treatment, severity}
+Description: Detect disease from image
+
+POST /api/voice_synthesis
+Body: {text, language}
+Response: {audio_url: "/static/audio/voice_xxx.mp3"}
+Description: Convert text to speech
+
+POST /api/chatbot
+Body: {question}
+Response: {response: "answer"}
+Description: AI chatbot responses
+
+6.5 NEW FEATURES APIs
+---------------------
+
+POST /api/alerts/send
+Auth: Required
+Body: {type, message, method}
+Response: {success: true, alert_id: 123}
+Description: Send SMS/WhatsApp alert
+
+GET /api/marketplace/listings
+Response: {listings: [{id, type, title, price, ...}]}
+Description: Get marketplace listings
+
+POST /api/marketplace/create
+Auth: Required
+Body: {type, category, title, price, quantity, ...}
+Response: {success: true, listing_id: 456}
+Description: Create marketplace listing
+
+POST /api/disease/detect
+Auth: Required
+Body: multipart/form-data {image, crop_name}
+Response: {disease, confidence, treatment, ...}
+Description: Detect crop disease
+
+GET /api/loan/eligibility
+Auth: Required
+Response: {eligible: true, max_amount: 50000, ...}
+Description: Check loan eligibility
+
+POST /api/loan/apply
+Auth: Required
+Body: {loan_type, amount, purpose, tenure}
+Response: {success: true, loan_id: 789}
+Description: Apply for loan
+
+GET /api/insurance/plans
+Response: {plans: [{name, premium_rate, coverage, ...}]}
+Description: Get insurance plans
+
+GET /api/videos/library
+Query: ?category=technique&language=en
+Response: {videos: [{id, title, description, ...}]}
+Description: Get video library
+
+POST /api/videos/watch/:id
+Auth: Required
+Response: {video_url, progress}
+Description: Watch video
+
+6.6 EQUIPMENT & BOOKING APIs
+----------------------------
+
+POST /api/book_equipment
+Auth: Required
+Body: {equipment_id}
+Response: {success: true, message: "Equipment booked"}
+Description: Book equipment
+
+================================================================================
+7. DATABASE SCHEMA
+================================================================================
+
+7.1 USER MANAGEMENT
+-------------------
+
+TABLE: user
+- id (PK)
+- username (unique)
+- email (unique)
+- password_hash
+- farm_size
+- location
+- phone
+- created_at
+
+7.2 AGRICULTURAL DATA
+---------------------
+
+TABLE: crop_data
+- id (PK)
+- user_id (FK)
+- crop_name
+- planting_date
+- expected_harvest
+- current_stage
+- area_planted
+
+TABLE: soil_data
+- id (PK)
+- user_id (FK)
+- ph
+- nitrogen
+- phosphorus
+- potassium
+- moisture
+- updated_at
+
+TABLE: weather_data
+- id (PK)
+- location
+- temperature
+- humidity
+- rainfall
+- wind_speed
+- timestamp
+
+7.3 FINANCIAL DATA
+------------------
+
+TABLE: expense
+- id (PK)
+- user_id (FK)
+- type (income/expense)
+- description
+- amount
+- category
+- date
+
+TABLE: loan_application
+- id (PK)
+- user_id (FK)
+- loan_type
+- amount
+- purpose
+- status
+- applied_at
+- interest_rate
+- tenure_months
+
+TABLE: insurance
+- id (PK)
+- user_id (FK)
+- scheme_name
+- crop_covered
+- sum_insured
+- premium
+- status
+- start_date
+- end_date
+
+7.4 OPERATIONS
+--------------
+
+TABLE: worker
+- id (PK)
+- user_id (FK)
+- name
+- phone
+- daily_wage
+- task
+- status
+- created_at
+
+TABLE: equipment
+- id (PK)
+- name
+- icon
+- rate
+- unit
+- distance
+- status
+- owner_contact
+
+7.5 COMMUNICATION
+-----------------
+
+TABLE: notification
+- id (PK)
+- user_id (FK)
+- title
+- message
+- icon
+- color
+- is_read
+- created_at
+
+TABLE: alert
+- id (PK)
+- user_id (FK)
+- alert_type
+- message
+- phone
+- status
+- created_at
+- sent_at
+
+7.6 MARKETPLACE
+---------------
+
+TABLE: marketplace_listing
+- id (PK)
+- user_id (FK)
+- listing_type (sell/buy/rent/hire)
+- category
+- title
+- description
+- price
+- quantity
+- unit
+- location
+- contact
+- status
+- created_at
+
+7.7 HEALTH & LEARNING
+---------------------
+
+TABLE: disease_detection
+- id (PK)
+- user_id (FK)
+- crop_name
+- disease_name
+- confidence
+- severity
+- treatment
+- image_path
+- detected_at
+- resolved
+
+TABLE: video_library
+- id (PK)
+- title
+- description
+- category
+- language
+- duration
+- video_url
+- thumbnail_url
+- views
+- likes
+- created_at
+
+TABLE: video_progress
+- id (PK)
+- user_id (FK)
+- video_id (FK)
+- progress
+- completed
+- last_watched
+
+================================================================================
+8. DEPLOYMENT GUIDE
+================================================================================
+
+8.1 LOCAL DEVELOPMENT
+---------------------
+
+1. Install Python 3.x
+2. Install dependencies:
+   pip install -r requirements.txt
+3. Run application:
+   python app.py
+4. Access: http://localhost:5000
+
+8.2 PRODUCTION DEPLOYMENT
+-------------------------
+
+REQUIREMENTS:
+- Python 3.8+
+- 2GB RAM minimum
+- 10GB storage
+- Ubuntu 20.04 or similar
+
+STEPS:
+1. Clone repository
+2. Install dependencies
+3. Set environment variables:
+   export SECRET_KEY="your-secret-key"
+   export OPENWEATHER_API_KEY="your-api-key"
+4. Use Gunicorn:
+   gunicorn -w 4 -b 0.0.0.0:5000 app:app
+5. Setup Nginx reverse proxy
+6. Enable HTTPS with Let's Encrypt
+7. Setup systemd service for auto-start
+
+8.3 DATABASE MIGRATION
+----------------------
+
+UPGRADE TO POSTGRESQL:
+1. Install psycopg2
+2. Update SQLALCHEMY_DATABASE_URI
+3. Run migrations:
+   flask db init
+   flask db migrate
+   flask db upgrade
+
+8.4 MONITORING
+--------------
+
+LOGGING:
+- Application logs: logs/app.log
+- Error logs: logs/error.log
+- Access logs: Nginx logs
+
+METRICS:
+- Response time
+- API success rate
+- Database query performance
+- User activity
+
+================================================================================
+9. TROUBLESHOOTING
+================================================================================
+
+COMMON ISSUES:
+
+1. Database locked error
+   Solution: Close all connections, restart app
+
+2. API timeout
+   Solution: Check internet connection, use fallback data
+
+3. ML model not found
+   Solution: Ensure model.pkl and yield_model.pkl exist
+
+4. Import errors
+   Solution: pip install -r requirements.txt
+
+5. Port already in use
+   Solution: Change port or kill existing process
+
+================================================================================
+10. FUTURE ENHANCEMENTS
+================================================================================
+
+PLANNED FEATURES:
+- Mobile app (React Native)
+- Real-time chat between farmers
+- Drone integration for field monitoring
+- Blockchain for supply chain
+- Advanced AI disease detection (CNN)
+- Weather-based crop calendar
+- Automated drip irrigation control
+- Satellite imagery analysis
+
+================================================================================
+END OF DOCUMENTATION
+================================================================================
+
+For support: contact@agri-advisory.com
+Version: 1.0
+Last Updated: 2024
+License: MIT

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Crop Advisory Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/final.css') }}?v={{ range(1, 10000) | random }}">
+</head>
+<body>
+    <!-- App Container -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h3><i class="fas fa-seedling"></i> Smart Crop</h3>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-menu-item">
+                    <a href="{{ url_for('dashboard') }}" class="active">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <div class="menu-section-title">AI Features</div>
+                <li class="sidebar-menu-item">
+                    <a href="#crop-recommendation">
+                        <i class="fas fa-brain"></i> Crop Recommendation
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="#soil">
+                        <i class="fas fa-leaf"></i> Soil Analysis
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="#weather">
+                        <i class="fas fa-cloud-sun"></i> Weather
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="#irrigation">
+                        <i class="fas fa-tint"></i> Irrigation
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="#market">
+                        <i class="fas fa-chart-line"></i> Market Prices
+                    </a>
+                </li>
+                <div class="menu-section-title">Management</div>
+                <li class="sidebar-menu-item">
+                    <a href="#finance">
+                        <i class="fas fa-rupee-sign"></i> Finance
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="#labor">
+                        <i class="fas fa-users"></i> Labor
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="#equipment">
+                        <i class="fas fa-tractor"></i> Equipment
+                    </a>
+                </li>
+                <div class="menu-section-title">Services</div>
+                <li class="sidebar-menu-item">
+                    <a href="#marketplace">
+                        <i class="fas fa-store"></i> Marketplace
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="#insurance">
+                        <i class="fas fa-shield-alt"></i> Insurance
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="#videos">
+                        <i class="fas fa-video"></i> Videos
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="{{ url_for('generate_report') }}">
+                        <i class="fas fa-file-pdf"></i> Reports
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <nav class="top-navbar">
+                <div class="navbar-left">
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search...">
+                    </div>
+                </div>
+                <div class="navbar-right">
+                    <div class="navbar-icon">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    <div class="user-profile">
+                        <div class="user-avatar">{{ user.username[0].upper() }}</div>
+                        <div class="user-info">
+                            <h6>{{ user.username }}</h6>
+                            <p><i class="fas fa-map-marker-alt"></i> {{ user.location }}</p>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('logout') }}" class="navbar-icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </div>
+            </nav>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Overview Cards -->
+                <div class="overview-cards">
+                    <div class="dashboard-card">
+                        <i class="fas fa-seedling"></i>
+                        <h4>Recommended Crop</h4>
+                        <div class="value">{{ crop_recommendations.top_3[0].crop|title }}</div>
+                        <div class="sub-value">{{ crop_recommendations.top_3[0].confidence }}% confidence</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h4>Predicted Yield</h4>
+                        <div class="value">{{ predicted_yield }}</div>
+                        <div class="sub-value">kg/hectare</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-rupee-sign"></i>
+                        <h4>Estimated Profit</h4>
+                        <div class="value">₹{{ "{:,.0f}".format(estimated_profit) }}</div>
+                        <div class="sub-value">per hectare</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-leaf"></i>
+                        <h4>Soil Health</h4>
+                        <div class="value">{{ sustainability_data.soil_health }}%</div>
+                        <div class="sub-value">Excellent condition</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-tint"></i>
+                        <h4>Water Efficiency</h4>
+                        <div class="value">{{ sustainability_data.water_usage_efficiency }}%</div>
+                        <div class="sub-value">Optimized usage</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-thermometer-half"></i>
+                        <h4>Temperature</h4>
+                        <div class="value">{{ weather.temperature }}°C</div>
+                        <div class="sub-value">{{ weather.description }}</div>
+                    </div>
+                </div>
+
+                <!-- Crop Recommendation Section -->
+                <div id="crop-recommendation" class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-brain"></i> AI Crop Recommendation
+                        <a href="{{ url_for('generate_report') }}" class="btn btn-danger btn-sm ms-auto">
+                            <i class="fas fa-file-pdf"></i> Download Report
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>AI-Powered Analysis:</strong> Based on your soil (N:{{ soil_data.nitrogen }}, P:{{ soil_data.phosphorus }}, K:{{ soil_data.potassium }}), weather ({{ weather.temperature }}°C, {{ weather.humidity }}% humidity), and market data.
+                            </div>
+                        </div>
+                        <div class="row">
+                            {% for crop in crop_recommendations.top_3 %}
+                            <div class="col-md-4">
+                                <div class="card" style="border-left: 4px solid {% if loop.index == 1 %}#4caf50{% elif loop.index == 2 %}#ff9800{% else %}#2196f3{% endif %};">
+                                    <div class="card-body text-center">
+                                        <h3 style="color: {% if loop.index == 1 %}#4caf50{% elif loop.index == 2 %}#ff9800{% else %}#2196f3{% endif %};">
+                                            #{{ loop.index }} {{ crop.crop|title }}
+                                        </h3>
+                                        <div class="row mt-3">
+                                            <div class="col-6">
+                                                <small>Confidence</small>
+                                                <h4>{{ crop.confidence }}%</h4>
+                                            </div>
+                                            <div class="col-6">
+                                                <small>ROI</small>
+                                                <h4>{{ crop.roi }}%</h4>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <p><strong>Yield:</strong> {{ crop.yield }} kg/ha</p>
+                                        <p><strong>Price:</strong> ₹{{ crop.price }}/quintal</p>
+                                        <h5 class="text-success"><strong>Profit: ₹{{ "{:,.0f}".format(crop.profit) }}</strong></h5>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Weather Chart -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-cloud-sun"></i> Weather Forecast
+                        </div>
+                        <div class="card-body" style="height: 400px;">
+                            <canvas id="weatherChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Soil Chart -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-leaf"></i> Soil Health
+                        </div>
+                        <div class="card-body" style="height: 400px;">
+                            <canvas id="soilChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Market Trends -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-chart-line"></i> Market Prices
+                        </div>
+                        <div class="card-body" style="height: 400px;">
+                            <canvas id="marketTrendsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Sustainability -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-recycle"></i> Sustainability Metrics
+                        </div>
+                        <div class="card-body" style="height: 400px;">
+                            <canvas id="sustainabilityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Soil Update Form -->
+                <div id="soil" class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-mountain"></i> Update Soil Data
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="/update_soil" class="row g-3">
+                            <div class="col-md-2">
+                                <label>Nitrogen (N)</label>
+                                <input name="nitrogen" class="form-control" placeholder="mg/kg" value="{{ soil_data.nitrogen }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label>Phosphorus (P)</label>
+                                <input name="phosphorus" class="form-control" placeholder="mg/kg" value="{{ soil_data.phosphorus }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label>Potassium (K)</label>
+                                <input name="potassium" class="form-control" placeholder="mg/kg" value="{{ soil_data.potassium }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label>pH Level</label>
+                                <input name="ph" class="form-control" placeholder="0-14" value="{{ soil_data.ph }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label>Moisture (%)</label>
+                                <input name="moisture" class="form-control" placeholder="0-100" value="{{ soil_data.moisture }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label>&nbsp;</label>
+                                <button class="btn btn-success w-100"><i class="fas fa-save"></i> Update</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Marketplace -->
+                <div id="marketplace" class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-store"></i> Community Marketplace
+                        <button class="btn btn-primary btn-sm ms-auto"><i class="fas fa-plus"></i> Post Listing</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="marketplace-grid">
+                            {% for listing in marketplace_listings[:4] %}
+                            <div class="marketplace-card">
+                                <div class="marketplace-card-image">
+                                    <i class="fas fa-{% if listing.category == 'crop' %}wheat{% elif listing.category == 'equipment' %}tractor{% else %}seedling{% endif %}"></i>
+                                </div>
+                                <div class="marketplace-card-body">
+                                    <div class="marketplace-card-title">{{ listing.title }}</div>
+                                    <div class="marketplace-card-price">₹{{ listing.price }}</div>
+                                    <div class="marketplace-card-details">
+                                        <span><i class="fas fa-box"></i> {{ listing.quantity }} {{ listing.unit }}</span>
+                                        <span><i class="fas fa-map-marker-alt"></i> {{ listing.location or 'Nearby' }}</span>
+                                    </div>
+                                    <button class="btn btn-success w-100"><i class="fas fa-phone"></i> Contact</button>
+                                </div>
+                            </div>
+                            {% endfor %}</div>
+                    </div>
+                </div>
+
+                <!-- Videos -->
+                <div id="videos" class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-video"></i> Educational Videos
+                    </div>
+                    <div class="card-body">
+                        <div class="video-grid">
+                            {% for video in videos[:3] %}
+                            <div class="video-card">
+                                <div class="video-thumbnail">
+                                    <i class="fas fa-play-circle"></i>
+                                    <div class="video-duration">{{ (video.duration // 60) if video.duration else 3 }}:00</div>
+                                </div>
+                                <div class="video-card-body">
+                                    <div class="video-card-title">{{ video.title }}</div>
+                                    <div class="video-card-stats">
+                                        <span><i class="fas fa-eye"></i> {{ video.views if video.views else 0 }}</span>
+                                        <span><i class="fas fa-thumbs-up"></i> {{ video.likes if video.likes else 0 }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const chartData = {{ chart_data|tojson }};
+        const forecastData = {{ forecast|tojson }};
+        const soilData = {{ soil_data|tojson }};
+        const sustainabilityData = {{ sustainability_data|tojson }};
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/charts.js') }}?v={{ range(1, 10000) | random }}"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+        });
+    </script>
+</body>
+</html>

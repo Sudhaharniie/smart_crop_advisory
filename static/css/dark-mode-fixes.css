@@ -1,0 +1,309 @@
+/* CRITICAL: Force all text to be visible in dark mode */
+body.theme-dark,
+body.theme-dark * {
+    color: #e8eef6 !important;
+}
+
+/* Force headings to be white */
+body.theme-dark h1,
+body.theme-dark h2,
+body.theme-dark h3,
+body.theme-dark h4,
+body.theme-dark h5,
+body.theme-dark h6 {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+/* Force all canvas/charts to be visible */
+canvas {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: #ffffff !important;
+}
+
+body.theme-dark canvas {
+    background: #1a2838 !important;
+    border: 2px solid #3a5570 !important;
+}
+
+/* Force metric cards text to be white */
+body.theme-dark .metric-card,
+body.theme-dark .metric-card * {
+    color: #ffffff !important;
+}
+
+/* Force all card text to be visible */
+body.theme-dark .card,
+body.theme-dark .card * {
+    color: #e8eef6 !important;
+}
+
+body.theme-dark .card h1,
+body.theme-dark .card h2,
+body.theme-dark .card h3,
+body.theme-dark .card h4,
+body.theme-dark .card h5,
+body.theme-dark .card h6 {
+    color: #ffffff !important;
+}
+
+/* Fix chart text colors in dark mode */
+body.theme-dark .chart-panel {
+    background: #162232 !important;
+    color: #e8eef6 !important;
+}
+
+/* Ensure all text is visible in dark mode */
+body.theme-dark,
+body.theme-dark * {
+    color: #e8eef6 !important;
+}
+
+/* Override for specific elements that need white text */
+body.theme-dark h1,
+body.theme-dark h2,
+body.theme-dark h3,
+body.theme-dark h4,
+body.theme-dark h5,
+body.theme-dark h6,
+body.theme-dark .metric-value,
+body.theme-dark .metric-label,
+body.theme-dark .metric-sub {
+    color: #ffffff !important;
+}
+
+/* Fix card text visibility */
+body.theme-dark .card-body,
+body.theme-dark .card-header,
+body.theme-dark .card-title,
+body.theme-dark .card-text {
+    color: #e8eef6 !important;
+}
+
+/* Fix table visibility */
+body.theme-dark .table {
+    color: #e8eef6 !important;
+}
+
+body.theme-dark .table thead th {
+    background: #1c2b3d !important;
+    color: #f0f5fa !important;
+    border-color: #2f455c !important;
+}
+
+body.theme-dark .table tbody td {
+    color: #e8eef6 !important;
+    border-color: #2f4a62 !important;
+}
+
+/* Fix form elements visibility */
+body.theme-dark .form-control,
+body.theme-dark .form-select,
+body.theme-dark .form-label,
+body.theme-dark label {
+    background: #122033 !important;
+    border-color: #324c63 !important;
+    color: #e6edf6 !important;
+}
+
+/* Fix button visibility */
+body.theme-dark .btn {
+    color: #ffffff !important;
+}
+
+/* Fix badge visibility */
+body.theme-dark .badge {
+    color: #ffffff !important;
+}
+
+/* Fix alert visibility */
+body.theme-dark .alert {
+    background-color: #162636 !important;
+    border-color: #2e4a62 !important;
+    color: #d9e6f2 !important;
+}
+
+/* Fix list items visibility */
+body.theme-dark .list-group-item {
+    background: transparent !important;
+    border-color: #2f4a62 !important;
+    color: #e8eef6 !important;
+}
+
+/* Fix dropdown visibility */
+body.theme-dark .dropdown-menu {
+    background: #162232 !important;
+    border-color: #2c4257 !important;
+}
+
+body.theme-dark .dropdown-item {
+    color: #e8eef6 !important;
+}
+
+body.theme-dark .dropdown-item:hover {
+    background: #1f3040 !important;
+    color: #ffffff !important;
+}
+
+/* Fix profit/sustainability metrics visibility */
+body.theme-dark .metric-card {
+    border-color: #3a5570 !important;
+}
+
+body.theme-dark .metric-card * {
+    color: #ffffff !important;
+}
+
+/* Fix weather card visibility */
+body.theme-dark .weather-card {
+    background: linear-gradient(135deg, #1a2838, #243548) !important;
+    border-color: #2f4a62 !important;
+}
+
+body.theme-dark .weather-card * {
+    color: #e8eef6 !important;
+}
+
+/* Fix insight card visibility */
+body.theme-dark .insight-card {
+    background: linear-gradient(180deg, #1a2838, #1f3040) !important;
+    border-color: #2f4a62 !important;
+}
+
+body.theme-dark .insight-card * {
+    color: #e8eef6 !important;
+}
+
+/* Ensure charts are always visible */
+canvas {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* Fix chart container visibility */
+.chart-panel,
+.chart-container,
+[id*="Chart"],
+[class*="chart"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Fix specific chart IDs */
+#soilChart,
+#weatherChart,
+#profitChart,
+#yieldChart,
+#sustainabilityChart,
+#marketChart,
+#forecastChart {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Fix profit comparison visibility */
+body.theme-dark .profit-comparison,
+body.theme-dark .profit-card,
+body.theme-dark .profit-metric {
+    color: #e8eef6 !important;
+}
+
+body.theme-dark .profit-comparison .card-body,
+body.theme-dark .profit-card .card-body {
+    color: #e8eef6 !important;
+}
+
+/* Fix sustainability metrics visibility */
+body.theme-dark .sustainability-metric,
+body.theme-dark .sustainability-card {
+    color: #e8eef6 !important;
+}
+
+body.theme-dark .sustainability-metric *,
+body.theme-dark .sustainability-card * {
+    color: #e8eef6 !important;
+}
+
+/* Fix progress bars visibility */
+body.theme-dark .progress {
+    background-color: #1f3040 !important;
+}
+
+body.theme-dark .progress-bar {
+    color: #ffffff !important;
+}
+
+/* Fix modal visibility */
+body.theme-dark .modal-content {
+    background: #162232 !important;
+    border-color: #2c4257 !important;
+    color: #e8eef6 !important;
+}
+
+body.theme-dark .modal-header,
+body.theme-dark .modal-footer {
+    border-color: #2f4a62 !important;
+}
+
+/* Fix tooltip visibility */
+body.theme-dark .tooltip-inner {
+    background: #1a2838 !important;
+    color: #ffffff !important;
+}
+
+/* Fix popover visibility */
+body.theme-dark .popover {
+    background: #162232 !important;
+    border-color: #2c4257 !important;
+}
+
+body.theme-dark .popover-body {
+    color: #e8eef6 !important;
+}
+
+/* Ensure all icons are visible */
+body.theme-dark i,
+body.theme-dark .fa,
+body.theme-dark .fas,
+body.theme-dark .far,
+body.theme-dark .fab {
+    color: inherit !important;
+    opacity: 1 !important;
+}
+
+/* Fix navbar visibility in dark mode */
+body.theme-dark .navbar {
+    background: linear-gradient(120deg, #0a1f16, #1a4d2e 46%, #2d7a4a) !important;
+}
+
+body.theme-dark .navbar-brand,
+body.theme-dark .nav-link {
+    color: #ffffff !important;
+}
+
+/* Fix sidebar visibility in dark mode */
+body.theme-dark .sidebar {
+    background: linear-gradient(180deg, #162232, #1b2a3c) !important;
+    border-color: #2c4257 !important;
+}
+
+body.theme-dark .sidebar .list-group-item {
+    color: #e8eef6 !important;
+}
+
+body.theme-dark .sidebar .list-group-item:hover {
+    background: linear-gradient(135deg, #1f3040, #243548) !important;
+    color: #ffffff !important;
+}
+
+body.theme-dark .sidebar .list-group-item.active {
+    background: linear-gradient(135deg, #2f4a62, #3a5570) !important;
+    color: #ffffff !important;
+}

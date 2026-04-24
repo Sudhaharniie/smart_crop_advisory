@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Crop Advisory Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-pro.css', v='20260308i') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode-fixes.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/force-charts-visible.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-pro">
+    <!-- Top Navigation -->
+    <nav class="navbar top-navbar">
+        <div class="container-fluid nav-shell">
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn icon-btn" id="sidebarToggle" type="button" title="Toggle Sidebar" aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="#">
+                    <span class="brand-mark"><i class="fas fa-seedling"></i></span>
+                    <span>Smart Crop Advisory</span>
+                </a>
+            </div>
+            <div class="topbar-search d-none d-lg-block">
+                <div class="search-wrap">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" placeholder="Search crops, prices, alerts...">
+                </div>
+            </div>
+            <div class="topbar-meta d-none d-md-flex">
+                <span class="meta-pill"><i class="fas fa-map-marker-alt"></i> {{ user.location }}</span>
+                <span class="meta-pill"><i class="fas fa-chart-area"></i> {{ user.farm_size }} ha</span>
+            </div>
+            <div class="navbar-nav ms-auto align-items-center flex-row gap-2">
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-language"></i> <span class="d-none d-lg-inline">Language</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" onclick="changeLanguage('en'); return false;"><i class="fas fa-check me-2"></i>English</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="changeLanguage('hi'); return false;">हिन्दी</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="changeLanguage('bn'); return false;">বাংলা</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="changeLanguage('te'); return false;">తెలుగు</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="changeLanguage('ta'); return false;">தமிழ்</a></li>
+                    </ul>
+                </div>
+                <button class="btn icon-btn" id="themeToggle" type="button" title="Toggle Theme" aria-label="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="btn icon-btn position-relative" type="button" title="Notifications" aria-label="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notif-dot">{{ notifications|length }}</span>
+                </button>
+                <a class="nav-link" href="#" onclick="speakDashboard()">
+                    <i class="fas fa-volume-up"></i> <span class="d-none d-lg-inline">Voice</span>
+                </a>
+                <a class="nav-link" href="#waste-management-section">
+                    <i class="fas fa-recycle"></i> <span class="d-none d-lg-inline">Waste Mgmt</span>
+                </a>
+                <a class="nav-link profile-chip" href="{{ url_for('logout') }}">
+                    <i class="fas fa-user-circle"></i> {{ user.username }}
+                </a>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid mt-4 dashboard-shell">
+        <div class="row g-4">
+            <!-- Sidebar -->
+            <div class="col-12 col-lg-3 col-xl-2" id="dashboardSidebarCol">
+                <div class="sidebar list-group">
+                    <a href="#overview" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <a href="#crop-recommendation" class="list-group-item list-group-item-action">
+                        <i class="fas fa-brain"></i> Crop Recommendation
+                    </a>
+                    <a href="#analytics" class="list-group-item list-group-item-action">
+                        <i class="fas fa-chart-line"></i> Analytics Snapshot
+                    </a>
+                    <a href="#soil" class="list-group-item list-group-item-action">
+                        <i class="fas fa-flask"></i> Soil Analysis
+                    </a>
+                    <a href="#fertilizer" class="list-group-item list-group-item-action">
+                        <i class="fas fa-vial"></i> Fertilizer
+                    </a>
+                    <a href="#weather" class="list-group-item list-group-item-action">
+                        <i class="fas fa-cloud-sun"></i> Weather
+                    </a>
+                    <a href="#climate-risk" class="list-group-item list-group-item-action">
+                        <i class="fas fa-exclamation-triangle"></i> Climate Risk
+                    </a>
+                    <a href="#irrigation" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tint"></i> Irrigation
+                    </a>
+                    <a href="#market" class="list-group-item list-group-item-action">
+                        <i class="fas fa-chart-line"></i> Market Prices
+                    </a>
+                    <a href="#pest-detection" class="list-group-item list-group-item-action">
+                        <i class="fas fa-bug"></i> Pest & Disease
+                    </a>
+                    <a href="#sustainability" class="list-group-item list-group-item-action">
+                        <i class="fas fa-leaf"></i> Sustainability
+                    </a>
+                    <a href="#expense-tracker" class="list-group-item list-group-item-action">
+                        <i class="fas fa-wallet"></i> Finance
+                    </a>
+                    <a href="#notifications" class="list-group-item list-group-item-action">
+                        <i class="fas fa-bell"></i> Notifications
+                    </a>
+                    <a href="#sms-alerts" class="list-group-item list-group-item-action">
+                        <i class="fas fa-sms"></i> SMS Alerts
+                    </a>
+                    <a href="#labor-management" class="list-group-item list-group-item-action">
+                        <i class="fas fa-users"></i> Labor
+                    </a>
+                    <a href="#equipment-rental" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tractor"></i> Equipment
+                    </a>
+                    <a href="#marketplace" class="list-group-item list-group-item-action">
+                        <i class="fas fa-store"></i> Marketplace
+                    </a>
+                    <a href="#loan-insurance" class="list-group-item list-group-item-action">
+                        <i class="fas fa-shield-alt"></i> Loans & Insurance
+                    </a>
+                    <a href="#video-library" class="list-group-item list-group-item-action">
+                        <i class="fas fa-video"></i> Learning Videos
+                    </a>
+                    <a href="#waste-management-section" class="list-group-item list-group-item-action">
+                        <i class="fas fa-recycle"></i> Waste Management
+                    </a>
+                    <a href="#smart-recommendations" class="list-group-item list-group-item-action">
+                        <i class="fas fa-lightbulb"></i> Smart Advice
+                    </a>
+                    <a href="#documentation" class="list-group-item list-group-item-action">
+                        <i class="fas fa-file-alt"></i> Reports
+                    </a>
+                    <hr class="my-1">
+                    <a href="/model-performance" class="list-group-item list-group-item-action text-primary" target="_blank" rel="noopener">
+                        <i class="fas fa-chart-line"></i> Model Performance
+                    </a>
+                    <a href="/prediction-history" class="list-group-item list-group-item-action text-primary" target="_blank" rel="noopener">
+                        <i class="fas fa-history"></i> Prediction History
+                    </a>
+                    <a href="/crop-comparison" class="list-group-item list-group-item-action text-primary" target="_blank" rel="noopener">
+                        <i class="fas fa-balance-scale"></i> Compare Crops
+                    </a>
+                    <a href="/risk-analysis" class="list-group-item list-group-item-action text-danger" target="_blank" rel="noopener">
+                        <i class="fas fa-exclamation-triangle"></i> Risk Analysis
+                    </a>
+                    <a href="/analytics" class="list-group-item list-group-item-action text-warning" target="_blank" rel="noopener">
+                        <i class="fas fa-chart-bar"></i> Analytics
+                    </a>
+                    <a href="/data-sources" class="list-group-item list-group-item-action text-secondary" target="_blank" rel="noopener">
+                        <i class="fas fa-database"></i> Data Sources
+                    </a>
+                    <a href="/documentation" class="list-group-item list-group-item-action text-secondary" target="_blank" rel="noopener">
+                        <i class="fas fa-book"></i> Documentation
+                    </a>
+                </div>
+            </div>
+            <!-- Main Content -->
+            <div class="col-12 col-lg-9 col-xl-10" id="dashboardMainCol">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle"></i> {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                <!-- Welcome -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="card hero-card text-white">
+                            <div class="card-body py-4">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                                    <div>
+                                        <p class="hero-eyebrow mb-1">Farm Intelligence Dashboard</p>
+                                        <h2 class="mb-2"><i class="fas fa-user-circle me-2"></i>Welcome back, {{ user.username }}</h2>
+                                        <p class="mb-0"><i class="fas fa-map-marker-alt me-1"></i>{{ user.location }} | <i class="fas fa-chart-area ms-2 me-1"></i>{{ user.farm_size }} hectares</p>
+                                    </div>
+                                    <div class="hero-actions d-flex gap-2">
+                                        <a href="{{ url_for('generate_report') }}" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-file-pdf me-1"></i> Export Report
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Overview -->
+                <div class="row mb-4 metric-grid" id="overview">
+                    <div class="col-sm-6 col-xl-4 mb-3">
+                        <div class="card metric-card metric-crop">
+                            <div class="card-body">
+                                <div class="metric-top">
+                                    <span class="metric-label">Recommended Crop</span>
+                                    <i class="fas fa-seedling"></i>
+                                </div>
+                                <h3 class="metric-value">{{ crop_recommendations.top_3[0].crop|title }}</h3>
+                                <p class="metric-sub">Top AI recommendation for this cycle</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-4 mb-3">
+                        <div class="card metric-card metric-confidence">
+                            <div class="card-body">
+                                <div class="metric-top">
+                                    <span class="metric-label">Confidence Score</span>
+                                    <i class="fas fa-bullseye"></i>
+                                </div>
+                                <h3 class="metric-value">{{ crop_recommendations.top_3[0].confidence }}%</h3>
+                                <p class="metric-sub">Model confidence on best crop</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-4 mb-3">
+                        <div class="card metric-card metric-yield">
+                            <div class="card-body">
+                                <div class="metric-top">
+                                    <span class="metric-label">Predicted Yield</span>
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <h3 class="metric-value">{{ "{:,.0f}".format(predicted_yield) }} kg/ha</h3>
+                                <p class="metric-sub">Expected productivity estimate</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-4 mb-3">
+                        <div class="card metric-card metric-profit">
+                            <div class="card-body">
+                                <div class="metric-top">
+                                    <span class="metric-label">Estimated Profit</span>
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <h3 class="metric-value">₹{{ "{:,.0f}".format(estimated_profit) }}</h3>
+                                <p class="metric-sub">Projected seasonal profitability</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-4 mb-3">
+                        <div class="card metric-card metric-soil">
+                            <div class="card-body">
+                                <div class="metric-top">
+                                    <span class="metric-label">Soil Health Score</span>
+                                    <i class="fas fa-mountain"></i>
+                                </div>
+                                <h3 class="metric-value">{{ sustainability_data.soil_health }}%</h3>
+                                <p class="metric-sub">Based on nutrient and pH profile</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-4 mb-3">
+                        <div class="card metric-card metric-water">
+                            <div class="card-body">
+                                <div class="metric-top">
+                                    <span class="metric-label">Water Efficiency</span>
+                                    <i class="fas fa-tint"></i>
+                                </div>
+                                <h3 class="metric-value">{{ sustainability_data.water_usage_efficiency }}%</h3>
+                                <p class="metric-sub">Irrigation optimization status</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-4 weather-strip">
+                    <div class="col-md-4 mb-3">
+                        <div class="card weather-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Temperature</span>
+                                    <i class="fas fa-thermometer-half"></i>
+                                </div>
+                                <h3 class="mb-0">{{ weather.temperature }}°C</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card weather-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Humidity</span>
+                                    <i class="fas fa-tint"></i>
+                                </div>
+                                <h3 class="mb-0">{{ weather.humidity }}%</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card weather-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Rainfall</span>
+                                    <i class="fas fa-cloud-rain"></i>
+                                </div>
+                                <h3 class="mb-0">{{ weather.rainfall }} mm</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-4 quick-insights">
+                    <div class="col-md-4 mb-3">
+                        <div class="card insight-card">
+                            <div class="card-body">
+                                <h6 class="mb-2"><i class="fas fa-bolt me-2"></i>Today</h6>
+                                <p class="mb-1">Weather is favorable for field activity.</p>
+                                <small class="text-muted">Track alerts and irrigation tasks from the side menu.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card insight-card">
+                            <div class="card-body">
+                                <h6 class="mb-2"><i class="fas fa-lightbulb me-2"></i>Insights</h6>
+                                <p class="mb-1">Top crop: <strong>{{ crop_recommendations.top_3[0].crop|title }}</strong></p>
+                                <small class="text-muted">Confidence {{ crop_recommendations.top_3[0].confidence }}% with high ROI potential.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card insight-card">
+                            <div class="card-body">
+                                <h6 class="mb-2"><i class="fas fa-tasks me-2"></i>Actions Required</h6>
+                                <p class="mb-1">Review notifications and expense log updates.</p>
+                                <small class="text-muted">Keep soil and labor records updated for better recommendations.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Crop Recommendation -->
+                <div class="row" id="crop-recommendation">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h3 class="mb-0"><i class="fas fa-seedling me-2"></i>Top 3 Crop Recommendations</h3>
+                                    <div>
+                                        <span class="badge bg-warning text-dark me-2">AI POWERED</span>
+                                        <a href="{{ url_for('generate_report') }}" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-file-pdf"></i> Download PDF Report
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-light border-success mb-4">
+                                    <p class="mb-0" style="font-size: 1.1rem;"><strong>AI Crop Recommendation</strong> uses machine learning to analyze your soil parameters (N, P, K, pH), current weather conditions, and historical data to predict the most suitable crops for your farm. The system provides confidence scores (85-95% accuracy) and estimates potential yield and profit for each crop.</p>
+                                </div>
+                                <!-- Top 3 Crops Display -->
+                                <div class="row mb-4">
+                                    {% for crop in crop_recommendations.top_3 %}
+                                    <div class="col-md-4">
+                                        <div class="card h-100 crop-rank-card crop-rank-{{ loop.index }}">
+                                            <div class="card-header text-center crop-rank-header-{{ loop.index }}">
+                                                <h4 class="mb-0">
+                                                    {% if loop.index == 1 %}
+                                                        <i class="fas fa-trophy"></i> #1 BEST CHOICE
+                                                    {% elif loop.index == 2 %}
+                                                        <i class="fas fa-medal"></i> #2 ALTERNATIVE
+                                                    {% else %}
+                                                        <i class="fas fa-star"></i> #3 OPTION
+                                                    {% endif %}
+                                                </h4>
+                                            </div>
+                                            <div class="card-body text-center crop-rank-body-{{ loop.index }}">
+                                                <i class="fas fa-seedling fa-4x mb-3 crop-rank-icon-{{ loop.index }}"></i>
+                                                <h2 class="display-5 fw-bold mb-2 crop-rank-title-{{ loop.index }}">{{ crop.crop|title }}</h2>
+                                                <div class="row mb-3">
+                                                    <div class="col-6">
+                                                        <div class="p-2 crop-stat-box">
+                                                            <small class="text-muted">Confidence</small>
+                                                            <h4 class="fw-bold mb-0 crop-rank-accent-{{ loop.index }}">{{ crop.confidence }}%</h4>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <div class="p-2 crop-stat-box">
+                                                            <small class="text-muted">ROI</small>
+                                                            <h4 class="fw-bold mb-0 crop-rank-accent-{{ loop.index }}">{{ crop.roi }}%</h4>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <div class="card crop-detail-box mb-2">
+                                                        <div class="card-body py-2">
+                                                            <small class="text-muted">Expected Yield</small>
+                                                            <h5 class="mb-0">{{ crop.yield }} kg/ha</h5>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card crop-detail-box mb-2">
+                                                        <div class="card-body py-2">
+                                                            <small class="text-muted">Market Price</small>
+                                                            <h5 class="mb-0">₹{{ crop.price }}/quintal</h5>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card crop-profit-box-{{ loop.index }} mb-0">
+                                                        <div class="card-body py-2">
+                                                            <small>Net Profit</small>
+                                                            <h4 class="mb-0 fw-bold">₹{{ "{:,.0f}".format(crop.profit) }}</h4>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% if loop.index == 1 %}
+                                                <button class="btn btn-success btn-lg w-100" onclick="speakCropRecommendation()">
+                                                    <i class="fas fa-volume-up"></i> Hear Details
+                                                </button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <!-- Why Best Crop Section -->
+                                <div class="alert alert-info" style="font-size: 1.05rem;">
+                                    <h5><i class="fas fa-lightbulb"></i> Why {{ crop_recommendations.top_3[0].crop|title }} is Best?</h5>
+                                    <ul class="mb-0">
+                                        <li>Optimal for your soil (N:{{ soil_data.nitrogen }}, P:{{ soil_data.phosphorus }}, K:{{ soil_data.potassium }})</li>
+                                        <li>Suitable weather conditions ({{ weather.temperature }}°C, {{ weather.humidity }}% humidity)</li>
+                                        <li>Highest profit potential: ₹{{ "{:,.0f}".format(crop_recommendations.top_3[0].profit) }} per hectare</li>
+                                        <li>{{ crop_recommendations.top_3[0].confidence }}% AI confidence score</li>
+                                        <li>Best ROI: {{ crop_recommendations.top_3[0].roi }}% return on investment</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Additional Visualizations Row -->
+                <div class="row" id="analytics">
+                    <div class="col-md-6">
+                        <div class="card shadow-lg">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Profit Comparison</h5>
+                            </div>
+                            <div class="card-body chart-panel chart-panel-lg">
+                                <div class="chart-skeleton"></div>
+                                <canvas id="profitComparisonChart" data-chart="true"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-lg">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-leaf me-2"></i>Sustainability Metrics</h5>
+                            </div>
+                            <div class="card-body chart-panel chart-panel-lg">
+                                <div class="chart-skeleton"></div>
+                                <canvas id="sustainabilityChart" data-chart="true"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Enhanced Visualization Row -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card shadow-lg">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Weather Overview</h5>
+                            </div>
+                            <div class="card-body chart-panel">
+                                <div class="chart-skeleton"></div>
+                                <canvas id="weatherOverviewChart" data-chart="true"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-lg">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Soil Nutrients</h5>
+                            </div>
+                            <div class="card-body chart-panel">
+                                <div class="chart-skeleton"></div>
+                                <canvas id="soilNutrientsChart" data-chart="true"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Market Trends Visualization -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow-lg">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Market Price Trends</h5>
+                            </div>
+                            <div class="card-body chart-panel chart-panel-lg">
+                                <div class="chart-skeleton"></div>
+                                <canvas id="marketTrendsChart" data-chart="true"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="weather">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5><i class="fas fa-cloud-sun"></i> Weather Forecast</h5>
+                                <button class="btn btn-primary btn-sm" onclick="speakWeather()">
+                                    <i class="fas fa-volume-up"></i> Hear Weather
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-light border-primary mb-3">
+                                    <p class="mb-0" style="font-size: 1.05rem;"><strong>Weather Forecast</strong> provides real-time weather data and 7-day predictions using OpenWeatherMap API. Monitor temperature, humidity, rainfall, and wind speed to plan farming activities. Receive alerts for extreme conditions (>35°C heat, heavy rain >20mm) to protect crops and optimize irrigation timing.</p>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="chart-panel">
+                                            <div class="chart-skeleton"></div>
+                                            <canvas id="weatherChart" data-chart="true"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 style="font-size: 1.1rem;">Current Conditions</h6>
+                                        <ul class="list-unstyled" style="font-size: 1.05rem;">
+                                            <li><strong>Wind Speed:</strong> {{ weather.wind_speed }} m/s</li>
+                                            <li><strong>Visibility:</strong> Good</li>
+                                            <li><strong>UV Index:</strong> Moderate</li>
+                                            <li><strong>Sunrise:</strong> 6:30 AM</li>
+                                            <li><strong>Sunset:</strong> 6:45 PM</li>
+                                        </ul>
+                                        <div class="alert alert-info">
+                                            <strong>Recommendation:</strong> Good weather for field activities.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CLIMATE RISK ASSESSMENT SECTION - NEW FEATURE! -->
+                {% if climate_risk %}
+                <div class="row mb-4" id="climate-risk">
+                    <div class="col-12">
+                        <div class="card shadow-lg border-danger" style="border-width: 3px;">
+                            <div class="card-header bg-danger text-white">
+                                <h3 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Climate Risk Assessment</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-light border-danger mb-4">
+                                    <p class="mb-0" style="font-size: 1.05rem;"><strong>Climate Risk Assessment</strong> analyzes real-time weather data to identify potential threats to your crops. Get early warnings for drought, flood, heat stress, frost, and wind damage with actionable recommendations to protect your farm.</p>
+                                </div>
+                                
+                                <!-- Overall Risk Score -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <div class="card {% if climate_risk.overall_risk == 'Critical' %}bg-danger{% elif climate_risk.overall_risk == 'High' %}bg-warning{% elif climate_risk.overall_risk == 'Medium' %}bg-info{% else %}bg-success{% endif %} text-white text-center">
+                                            <div class="card-body py-4">
+                                                <h2 class="mb-2">Overall Climate Risk: {{ climate_risk.overall_risk }}</h2>
+                                                <h1 class="display-3 fw-bold">{{ climate_risk.risk_score }}/100</h1>
+                                                <p class="mb-0 fs-5">Climate conditions assessment based on 7-day forecast</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Individual Risk Factors -->
+                                <div class="row">
+                                    <!-- Drought Risk -->
+                                    <div class="col-md-6 col-lg-3 mb-3">
+                                        <div class="card h-100 border-{% if climate_risk.drought.level == 'Critical' %}danger{% elif climate_risk.drought.level == 'High' %}warning{% elif climate_risk.drought.level == 'Medium' %}info{% else %}success{% endif %}" style="border-width: 2px;">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-sun fa-3x text-warning mb-3"></i>
+                                                <h5>Drought Risk</h5>
+                                                <h3 class="text-{% if climate_risk.drought.level == 'Critical' %}danger{% elif climate_risk.drought.level == 'High' %}warning{% elif climate_risk.drought.level == 'Medium' %}info{% else %}success{% endif %}">{{ climate_risk.drought.level }}</h3>
+                                                <hr>
+                                                <p class="small mb-2"><strong>7-Day Rainfall:</strong> {{ climate_risk.drought.value|round(1) }} mm</p>
+                                                <p class="small mb-0">{{ climate_risk.drought.description }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Flood Risk -->
+                                    <div class="col-md-6 col-lg-3 mb-3">
+                                        <div class="card h-100 border-{% if climate_risk.flood.level == 'Critical' %}danger{% elif climate_risk.flood.level == 'High' %}warning{% elif climate_risk.flood.level == 'Medium' %}info{% else %}success{% endif %}" style="border-width: 2px;">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-cloud-showers-heavy fa-3x text-primary mb-3"></i>
+                                                <h5>Flood Risk</h5>
+                                                <h3 class="text-{% if climate_risk.flood.level == 'Critical' %}danger{% elif climate_risk.flood.level == 'High' %}warning{% elif climate_risk.flood.level == 'Medium' %}info{% else %}success{% endif %}">{{ climate_risk.flood.level }}</h3>
+                                                <hr>
+                                                <p class="small mb-2"><strong>Total Rainfall:</strong> {{ climate_risk.flood.value|round(1) }} mm</p>
+                                                <p class="small mb-0">{{ climate_risk.flood.description }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Heat Stress Risk -->
+                                    <div class="col-md-6 col-lg-3 mb-3">
+                                        <div class="card h-100 border-{% if climate_risk.heat_stress.level == 'Critical' %}danger{% elif climate_risk.heat_stress.level == 'High' %}warning{% elif climate_risk.heat_stress.level == 'Medium' %}info{% else %}success{% endif %}" style="border-width: 2px;">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-temperature-high fa-3x text-danger mb-3"></i>
+                                                <h5>Heat Stress</h5>
+                                                <h3 class="text-{% if climate_risk.heat_stress.level == 'Critical' %}danger{% elif climate_risk.heat_stress.level == 'High' %}warning{% elif climate_risk.heat_stress.level == 'Medium' %}info{% else %}success{% endif %}">{{ climate_risk.heat_stress.level }}</h3>
+                                                <hr>
+                                                <p class="small mb-2"><strong>Max Temp:</strong> {{ climate_risk.heat_stress.value|round(1) }}&deg;C</p>
+                                                <p class="small mb-0">{{ climate_risk.heat_stress.description }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Cold/Frost Risk -->
+                                    <div class="col-md-6 col-lg-3 mb-3">
+                                        <div class="card h-100 border-{% if climate_risk.frost.level == 'Critical' %}danger{% elif climate_risk.frost.level == 'High' %}warning{% elif climate_risk.frost.level == 'Medium' %}info{% else %}success{% endif %}" style="border-width: 2px;">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-snowflake fa-3x text-info mb-3"></i>
+                                                <h5>Frost Risk</h5>
+                                                <h3 class="text-{% if climate_risk.frost.level == 'Critical' %}danger{% elif climate_risk.frost.level == 'High' %}warning{% elif climate_risk.frost.level == 'Medium' %}info{% else %}success{% endif %}">{{ climate_risk.frost.level }}</h3>
+                                                <hr>
+                                                <p class="small mb-2"><strong>Min Temp:</strong> {{ climate_risk.frost.value|round(1) }}&deg;C</p>
+                                                <p class="small mb-0">{{ climate_risk.frost.description }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Recommendations & Alerts -->
+                                {% if climate_risk.recommendations %}
+                                <div class="alert alert-warning mt-4">
+                                    <h5><i class="fas fa-lightbulb"></i> Recommended Actions</h5>
+                                    <ul class="mb-0">
+                                        {% for rec in climate_risk.recommendations %}
+                                        <li>{{ rec }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                                
+                                {% if climate_risk.alerts %}
+                                <div class="alert alert-danger mt-3">
+                                    <h5><i class="fas fa-exclamation-circle"></i> Active Alerts</h5>
+                                    {% for alert in climate_risk.alerts %}
+                                    <div class="mb-2"><strong>{{ alert }}</strong></div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Soil Health Section -->
+                <div class="card inline-soil-form-card mb-3">
+                    <div class="card-body">
+                        <form method="POST" action="/update_soil" class="row g-2 align-items-end inline-soil-form">
+                            <div class="col-md-2 col-6"><input name="nitrogen" class="form-control" placeholder="Nitrogen (N)"></div>
+                            <div class="col-md-2 col-6"><input name="phosphorus" class="form-control" placeholder="Phosphorus (P)"></div>
+                            <div class="col-md-2 col-6"><input name="potassium" class="form-control" placeholder="Potassium (K)"></div>
+                            <div class="col-md-2 col-6"><input name="ph" class="form-control" placeholder="pH"></div>
+                            <div class="col-md-2 col-6"><input name="moisture" class="form-control" placeholder="Moisture"></div>
+                            <div class="col-md-2 col-6 d-grid"><button class="btn btn-success">Update Soil</button></div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row" id="soil">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5><i class="fas fa-mountain"></i> Soil Health Analysis</h5>
+                                <button class="btn btn-warning btn-sm" onclick="speakSoilData()">
+                                    <i class="fas fa-volume-up"></i> Hear Soil Status
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-light border-warning mb-3">
+                                    <p class="mb-0"><strong>Soil Health Analysis</strong> monitors essential nutrients (Nitrogen, Phosphorus, Potassium), pH levels (0-14 scale), and moisture content. Regular testing every 3 months helps maintain optimal soil conditions. The system provides specific recommendations for nutrient deficiencies and suggests organic amendments to improve soil quality naturally.</p>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Soil Composition</h6>
+                                         <div class="mt-4 chart-panel chart-panel-sm">
+                                           <div class="chart-skeleton"></div>
+                                           <canvas id="soilChart" data-chart="true"></canvas>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <h6>pH Level</h6>
+                                                        <h4 class="text-success">{{ soil_data.ph }}</h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <h6>Moisture</h6>
+                                                        <h4 class="text-info">{{ soil_data.moisture }}%</h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-4">
+                                                <small>Nitrogen</small>
+                                                <div class="progress">
+                                                    <div class="progress-bar bg-primary" style="width: {{ (soil_data.nitrogen/50)*100 }}%"></div>
+                                                </div>
+                                                <small>{{ soil_data.nitrogen }}mg/kg</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <small>Phosphorus</small>
+                                                <div class="progress">
+                                                    <div class="progress-bar bg-warning" style="width: {{ (soil_data.phosphorus/30)*100 }}%"></div>
+                                                </div>
+                                                <small>{{ soil_data.phosphorus }}mg/kg</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <small>Potassium</small>
+                                                <div class="progress">
+                                                    <div class="progress-bar bg-danger" style="width: {{ (soil_data.potassium/300)*100 }}%"></div>
+                                                </div>
+                                                <small>{{ soil_data.potassium }}mg/kg</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Recommendations</h6>
+                                        {% if soil_recommendations %}
+                                            {% for recommendation in soil_recommendations %}
+                                                <div class="alert alert-info">
+                                                    <i class="fas fa-lightbulb"></i> {{ recommendation }}
+                                                </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <div class="alert alert-success">
+                                                <i class="fas fa-check-circle"></i> Your soil health is optimal!
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="fertilizer">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5><i class="fas fa-flask"></i> Fertilizer Recommendations</h5>
+                                <button class="btn btn-success btn-sm" onclick="speakFertilizer()">
+                                    <i class="fas fa-volume-up"></i> Hear Recommendations
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-light border-success mb-3">
+                                    <p class="mb-0"><strong>Fertilizer Recommendations</strong> suggests optimal nutrient applications based on soil test results. Recommends Urea for nitrogen, DAP for phosphorus, and MOP for potassium with precise quantities and timing. Prioritizes organic fertilizers and compost for sustainable farming and healthier crops.</p>
+                                </div>
+                                <div class="row">
+                                    {% for fertilizer in fertilizer_recommendations %}
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card border-success">
+                                            <div class="card-body">
+                                                <h6 class="text-success">{{ fertilizer.name }}</h6>
+                                                <p><strong>Quantity:</strong> {{ fertilizer.quantity }}</p>
+                                                <p><strong>Timing:</strong> {{ fertilizer.timing }}</p>
+                                                <span class="badge bg-success">Eco-Friendly</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="col-12">
+                                        <div class="alert alert-secondary mb-0">Fertilizer recommendations are currently unavailable.</div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="alert alert-warning">
+                                    <strong>Organic Recommendation:</strong> Prefer organic fertilizers and compost for sustainable farming and healthier crops.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="irrigation">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5><i class="fas fa-tint"></i> Irrigation Management</h5>
+                                <button class="btn btn-info btn-sm" onclick="speakIrrigation()">
+                                    <i class="fas fa-volume-up"></i> Hear Schedule
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-light border-info mb-3">
+                                    <p class="mb-0"><strong>Irrigation Management</strong> creates smart watering schedules based on soil moisture levels, weather forecasts, and crop water requirements. Recommends drip irrigation for 30% water savings and optimal timing (early morning/evening). Prevents over-watering and under-watering to maximize crop health and yield.</p>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h6>Irrigation Schedule</h6>
+                                        <div class="table-ux-toolbar mb-2">
+                                            <input type="text" class="form-control form-control-sm" id="irrigationFilter" placeholder="Filter schedule...">
+                                            <button class="btn btn-outline-secondary btn-sm" id="toggleCompactMode" type="button">Compact</button>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-ux" id="irrigationTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>Amount</th>
+                                                        <th>Method</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for schedule in irrigation_schedule %}
+                                                    <tr>
+                                                        <td>{{ schedule.date }}</td>
+                                                        <td>{{ schedule.amount }}</td>
+                                                        <td>{{ schedule.type }}</td>
+                                                        <td><span class="badge bg-warning">Pending</span></td>
+                                                    </tr>
+                                                    {% else %}
+                                                    <tr>
+                                                        <td colspan="4" class="text-center text-muted py-3">No irrigation schedule available right now.</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6>Water Conservation Tips</h6>
+                                        <div class="alert alert-success">
+                                            <ul class="mb-0">
+                                                <li>Use drip irrigation for 30% water savings</li>
+                                                <li>Irrigate during early morning</li>
+                                                <li>Mulch around plants</li>
+                                                <li>Check soil moisture before watering</li>
+                                            </ul>
+                                        </div>
+                                         <h6>Irrigation Advice</h6>
+                                        {% for a in irrigation_advice %}
+                                        <div class="alert alert-info">{{ a }}</div>
+                                        {% else %}
+                                        <div class="alert alert-secondary">No irrigation advice generated yet.</div>
+                                        {% endfor %}
+                                        <div class="card bg-light">
+                                            <div class="card-body text-center">
+                                                <h6>Water Efficiency</h6>
+                                                <h3 class="text-success">{{ sustainability_data.water_usage_efficiency }}%</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="market">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5><i class="fas fa-chart-line"></i> Market Prices & Mandi Rates</h5>
+                                <button class="btn btn-primary btn-sm" onclick="speakMarketPrices()">
+                                    <i class="fas fa-volume-up"></i> Hear Prices
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-light border-primary mb-3">
+                                    <p class="mb-0"><strong>Market Prices & Mandi Rates</strong> displays live wholesale prices from government mandi API, updated daily. Track price trends (up/down/stable) to identify best selling times. Compare prices across crops to make informed decisions and maximize profits by selling at optimal market conditions.</p>
+                                </div>
+                                <div class="row">
+                                    {% for crop, price_data in market_prices.items() %}
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card {% if price_data.trend == 'up' %}border-success{% elif price_data.trend == 'down' %}border-danger{% else %}border-warning{% endif %}">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <h6>{{ crop.title() }}</h6>
+                                                    <i class="fas fa-arrow-{% if price_data.trend == 'up' %}up text-success{% elif price_data.trend == 'down' %}down text-danger{% else %}right text-warning{% endif %}"></i>
+                                                </div>
+                                                <h4>₹{{ "%.2f"|format(price_data.current_price) }}</h4>
+                                                <small>per quintal</small>
+                                                <br>
+                                                <small class="text-muted">Last week: ₹{{ "%.2f"|format(price_data.last_week) }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="col-12">
+                                        <div class="alert alert-secondary mb-0">Market price data is not available at the moment.</div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="alert alert-info">
+                                    <strong>Best Selling Time:</strong> Based on market analysis, the optimal time to sell your crops is in the next 2-3 weeks.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="pest-detection">
+                    <div class="col-12">
+                        <div class="card shadow-lg border-danger" style="border-width: 2px;">
+                            <div class="card-header bg-danger text-white">
+                                <h5 class="mb-0"><i class="fas fa-bug me-2"></i> Pest & Disease Detection</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-light border-danger mb-3">
+                                    <p class="mb-0"><strong>Pest & Disease Detection</strong> uses AI image recognition to identify crop diseases from photos. Upload leaf/plant images to detect issues like Leaf Blight, Aphids, Powdery Mildew, and Rust with 75-98% confidence. Receive instant treatment recommendations including organic solutions like neem oil and copper-based fungicides.</p>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Upload Crop Image for Analysis</h6>
+                                        <form id="pestDetectionForm" enctype="multipart/form-data">
+                                            <input type="file" class="form-control mb-3" id="cropImage" accept="image/*" required>
+                                            <button type="submit" class="btn btn-danger"><i class="fas fa-search"></i> Analyze Image</button>
+                                        </form>
+                                        <div id="detectionResult" class="mt-3"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Recent Alerts</h6>
+                                        <div class="alert alert-warning">
+                                            <strong><i class="fas fa-exclamation-triangle"></i> Aphid Alert:</strong> Moderate risk in your area. Use neem oil spray.
+                                        </div>
+                                        <div class="alert alert-info">
+                                            <strong><i class="fas fa-info-circle"></i> Leaf Blight:</strong> Low risk. Monitor regularly.
+                                        </div>
+                                        <div class="alert alert-success">
+                                            <strong><i class="fas fa-check-circle"></i> Overall Health:</strong> Your crops are healthy!
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="sustainability">
+    <div class="col-12">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-recycle"></i> Sustainability & Eco-Friendly Practices</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="alert alert-success text-center">
+                            <strong>Soil Health Score</strong><br>
+                            {{ sustainability_data.soil_health }}%
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="alert alert-info text-center">
+                            <strong>Organic Usage</strong><br>
+                            {{ sustainability_data.organic_usage }}%
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="alert alert-warning text-center">
+                            <strong>Water Saved</strong><br>
+                            {{ sustainability_data.water_saved }} L
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <i class="fas fa-leaf fa-2x text-success"></i>
+                                <h6>Carbon Footprint</h6>
+                                <h5 class="text-success">{{ sustainability_data.carbon_footprint }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <i class="fas fa-bug fa-2x text-warning"></i>
+                                <h6>Pesticide Usage</h6>
+                                <h5 class="text-success">{{ sustainability_data.pesticide_usage }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <i class="fas fa-seedling fa-2x text-primary"></i>
+                                <h6>Biodiversity Score</h6>
+                                <h5 class="text-primary">{{ sustainability_data.biodiversity_score }}%</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <i class="fas fa-star fa-2x text-warning"></i>
+                                <h6>Eco Rating</h6>
+                                <h5 class="text-warning">{{ sustainability_data.eco_friendly_rating }}/5</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+                <div class="row" id="expense-tracker">
+                    <div class="col-12">
+                        <div class="card shadow-lg border-success" style="border-width: 2px;">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="fas fa-wallet me-2"></i> Expense Tracker & Financial Management</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-light border-success mb-3">
+                                    <p class="mb-0"><strong>Expense Tracker</strong> records all farm income and expenses with automatic profit/loss calculations. Track spending by category (seeds, fertilizer, labor, equipment) and monitor crop sale revenues. Generate financial reports to understand farm profitability and make data-driven investment decisions.</p>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <h6>Add Transaction</h6>
+                                        <form id="expenseForm">
+                                            <select class="form-control mb-2" id="transactionType" required>
+                                                <option value="income">Income</option>
+                                                <option value="expense">Expense</option>
+                                            </select>
+                                            <input type="text" class="form-control mb-2" id="description" placeholder="Description" required>
+                                            <input type="number" class="form-control mb-2" id="amount" placeholder="Amount (₹)" required>
+                                            <select class="form-control mb-2" id="category">
+                                                <option>Seeds</option>
+                                                <option>Fertilizer</option>
+                                                <option>Labor</option>
+                                                <option>Equipment</option>
+                                                <option>Crop Sale</option>
+                                                <option>Other</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-success w-100"><i class="fas fa-plus"></i> Add</button>
+                                        </form>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6>Financial Summary</h6>
+                                        <div class="card bg-light mb-2">
+                                            <div class="card-body text-center">
+                                                <small>Total Income</small>
+                                                <h4 class="text-success">₹{{ expenses.total_income }}</h4>
+                                            </div>
+                                        </div>
+                                        <div class="card bg-light mb-2">
+                                            <div class="card-body text-center">
+                                                <small>Total Expenses</small>
+                                                <h4 class="text-danger">₹{{ expenses.total_expense }}</h4>
+                                            </div>
+                                        </div>
+                                        <div class="card bg-success text-white">
+                                            <div class="card-body text-center">
+                                                <small>Net Profit</small>
+                                                <h4>₹{{ expenses.net_profit }}</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6>Recent Transactions</h6>
+                                        <ul class="list-group" style="max-height: 300px; overflow-y: auto;">
+                                            {% for trans in expenses.transactions %}
+                                            <li class="list-group-item d-flex justify-content-between">
+                                                <div>
+                                                    <strong>{{ trans.description }}</strong><br>
+                                                    <small class="text-muted">{{ trans.category }}</small>
+                                                </div>
+                                                <span class="text-{{ 'success' if trans.type == 'income' else 'danger' }}">{{ '+' if trans.type == 'income' else '-' }}₹{{ trans.amount }}</span>
+                                            </li>
+                                            {% else %}
+                                            <li class="list-group-item text-muted">No transactions recorded yet.</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="notifications">
+                    <div class="col-12">
+                        <div class="card shadow-lg border-info" style="border-width: 2px;">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0"><i class="fas fa-bell me-2"></i> Smart Notifications & Reminders</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-light border-info mb-3">
+                                    <p class="mb-0"><strong>Smart Notifications</strong> sends automated reminders for irrigation schedules, fertilizer applications, harvest times, and market opportunities. Receive weather alerts, price change notifications, and pest warnings. Never miss critical farming tasks with intelligent reminder system.</p>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Upcoming Tasks</h6>
+                                        <ul class="list-group">
+                                            {% for notif in notifications %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <i class="fas fa-{{ notif.icon }} text-{{ notif.color }} me-2"></i>
+                                                    <strong>{{ notif.title }}</strong><br>
+                                                    <small class="text-muted">{{ notif.message }}</small>
+                                                </div>
+                                                <span class="badge bg-{{ notif.color }}">{{ notif.date }}</span>
+                                            </li>
+                                            {% else %}
+                                            <li class="list-group-item text-muted">No upcoming notifications.</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Price Alerts</h6>
+                                        <div class="alert alert-success">
+                                            <strong><i class="fas fa-arrow-up"></i> Rice Price Up:</strong> ₹2000/quintal (+2.5%)
+                                        </div>
+                                        <div class="alert alert-warning">
+                                            <strong><i class="fas fa-clock"></i> Harvest Reminder:</strong> Wheat ready in 5 days
+                                        </div>
+                                        <div class="alert alert-info">
+                                            <strong><i class="fas fa-cloud-rain"></i> Weather Alert:</strong> Rain expected tomorrow
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- SMS/WhatsApp Alerts -->
+                <div class="row mb-4" id="sms-alerts">
+                    <div class="col-12">
+                        <div class="card shadow-lg border-info" style="border-width: 2px;">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0"><i class="fas fa-sms me-2"></i> SMS & WhatsApp Alerts</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-light border-info">
+                                    <p class="mb-0"><strong>SMS & WhatsApp Alerts</strong> deliver critical farming information directly to your mobile phone without requiring internet access. Receive automated notifications for weather warnings (temperature >35°C, heavy rain forecasts), market price changes (>10% fluctuation), irrigation reminders (based on soil moisture), and pest outbreak alerts. Customize which alerts you receive and get timely information to make better farming decisions.</p>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Alert Settings</h6>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" checked>
+                                            <label class="form-check-label">Weather Alerts</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" checked>
+                                            <label class="form-check-label">Price Alerts</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" checked>
+                                            <label class="form-check-label">Irrigation Reminders</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox">
+                                            <label class="form-check-label">Pest Alerts</label>
+                                        </div>
+                                        <button class="btn btn-info mt-3" onclick="saveAlertSettings()">Save Settings</button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Recent Alerts ({{ alerts|length }})</h6>
+                                        {% for alert in alerts[:3] %}
+                                        <div class="alert alert-{{ 'warning' if alert.type == 'weather' else 'success' if alert.type == 'price' else 'info' }}">
+                                            <small>{{ alert.date }}</small><br>
+                                            <strong>{{ alert.type|title }} Alert:</strong> {{ alert.message }}
+                                        </div>
+                                        {% else %}
+                                        <div class="alert alert-secondary">No recent alerts available.</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="labor-management">
+                    <div class="col-12">
+                        <div class="card shadow-lg border-info" style="border-width: 2px;">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0"><i class="fas fa-users me-2"></i> Labor Management</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-light border-info mb-3">
+                                    <p class="mb-0"><strong>Labor Management</strong> tracks farm workers, daily wages, and task assignments. Maintain worker database with contact details and wage rates. Calculate daily labor costs automatically and monitor attendance. Helps manage seasonal workers efficiently and ensures fair wage payments.</p>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <h6>Add Worker</h6>
+                                        <form method="POST" action="/add_worker_form">
+                                            <input type="text" name="name" class="form-control mb-2" placeholder="Name" required>
+                                            <input type="number" name="wage" class="form-control mb-2" placeholder="Wage (₹)" required>
+                                            <input type="text" name="task" class="form-control mb-2" placeholder="Task" value="General">
+                                            <button type="submit" class="btn btn-info w-100"><i class="fas fa-user-plus"></i> Add Worker</button>
+                                        </form>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6>Attendance</h6>
+                                        <div class="card bg-light mb-2">
+                                            <div class="card-body text-center">
+                                                <h3 class="text-success">{{ labor.present }}</h3>
+                                                <small>Present</small>
+                                            </div>
+                                        </div>
+                                        <div class="card bg-info text-white">
+                                            <div class="card-body text-center">
+                                                <h4>₹{{ labor.total_wages }}</h4>
+                                                <small>Today's Wages</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6>Workers ({{ labor.present }} total)</h6>
+                                        {% if labor.workers %}
+                                        <ul class="list-group">
+                                            {% for worker in labor.workers %}
+                                            <li class="list-group-item d-flex justify-content-between">
+                                                <div>
+                                                    <strong>{{ worker.name }}</strong><br>
+                                                    <small class="text-muted">{{ worker.task }}</small>
+                                                </div>
+                                                <span class="badge bg-success">₹{{ worker.wage }}</span>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                        {% else %}
+                                        <div class="alert alert-warning">No workers added yet. Add your first worker!</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="equipment-rental">
+                    <div class="col-12">
+                        <div class="card shadow-lg border-warning" style="border-width: 2px;">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0"><i class="fas fa-tractor me-2"></i> Equipment Rental Marketplace</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-light border-warning mb-3">
+                                    <p class="mb-0"><strong>Equipment Rental</strong> connects farmers to rent tractors, harvesters, sprayers, and other machinery. View available equipment nearby with daily/hourly rates and distance. Book equipment instantly and reduce capital costs by renting instead of buying. Share your own equipment to generate additional income.</p>
+                                </div>
+                                <div class="row">
+                                    {% for equip in equipment %}
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card h-100 {% if equip.status == 'Booked' %}border-danger{% else %}border-success{% endif %}">
+                                            <div class="card-body">
+                                                <h5><i class="fas fa-{{ equip.icon }}"></i> {{ equip.name }}</h5>
+                                                <h4 class="text-success">₹{{ equip.rate }}/{{ equip.unit }}</h4>
+                                                <p><i class="fas fa-map-marker-alt"></i> {{ equip.distance }} km away</p>
+                                                <span class="badge {% if equip.status == 'Available' %}bg-success{% else %}bg-danger{% endif %}">{{ equip.status }}</span>
+                                                {% if equip.status == 'Available' %}
+                                                <button class="btn btn-warning btn-sm w-100 mt-2" onclick="bookEquipment({{ loop.index0 }}, '{{ equip.name }}')"><i class="fas fa-calendar-check"></i> Book Now</button>
+                                                {% else %}
+                                                <button class="btn btn-secondary btn-sm w-100 mt-2" disabled><i class="fas fa-ban"></i> Not Available</button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% if not equipment %}
+                                <div class="alert alert-info">No equipment available. Check back later!</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+<script>
+function bookEquipment(index, name) {
+    if(confirm(`Book ${name}?`)) {
+        fetch('/api/book_equipment', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({equipment_id: index + 1})
+        })
+        .then(r => r.json())
+        .then(data => {
+            if(data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.error || 'Booking failed');
+            }
+        });
+    }
+}
+</script>
+                <!-- Community Marketplace -->
+                <div class="row mb-4" id="marketplace">
+                    <div class="col-12">
+                        <div class="card shadow-lg border-primary" style="border-width: 2px;">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-store me-2"></i> Community Marketplace</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-light border-primary">
+                                    <p class="mb-0"><strong>Community Marketplace</strong> connects farmers directly, eliminating middlemen and increasing profits by 15-30%. Post listings to sell your harvest, rent out equipment when not in use, or find workers for seasonal tasks. Browse nearby listings to buy quality produce, rent tractors or harvesters, and hire experienced labor. All transactions are peer-to-peer with direct contact between farmers.</p>
+                                </div>
+                                <div class="row">
+                                    {% for listing in marketplace_listings[:4] %}
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card border-{{ 'success' if listing.type == 'sell' else 'warning' if listing.type == 'rent' else 'info' }}">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-{{ 'wheat' if listing.category == 'crop' else 'tractor' if listing.category == 'equipment' else 'seedling' if listing.category == 'seeds' else 'users' }} fa-3x text-{{ 'success' if listing.type == 'sell' else 'warning' if listing.type == 'rent' else 'info' }} mb-2"></i>
+                                                <h6>{{ listing.title }}</h6>
+                                                <h4 class="text-{{ 'success' if listing.type == 'sell' else 'warning' if listing.type == 'rent' else 'info' }}">₹{{ listing.price }}</h4>
+                                                <small>{{ listing.quantity }} {{ listing.unit }}</small><br>
+                                                <button class="btn btn-{{ 'success' if listing.type == 'sell' else 'warning' if listing.type == 'rent' else 'info' }} btn-sm mt-2" onclick="contactSeller({{ listing.id if listing.id else loop.index }}, '{{ listing.title }}')">{{ 'Buy' if listing.type == 'sell' else 'Rent' if listing.type == 'rent' else 'Contact' }}</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="col-12">
+                                        <div class="alert alert-secondary mb-0">No marketplace listings are available currently.</div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <button class="btn btn-primary" onclick="postNewListing()"><i class="fas fa-plus"></i> Post New Listing</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Loan & Insurance -->
+                <div class="row mb-4" id="loan-insurance">
+                    <div class="col-12">
+                        <div class="card shadow-lg border-success" style="border-width: 2px;">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="fas fa-hand-holding-usd me-2"></i> Loan & Insurance Services</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-light border-success">
+                                    <p class="mb-0"><strong>Loan & Insurance Services</strong> provide instant access to agricultural financing. The system calculates your loan eligibility based on farm size and income history, with interest rates as low as 7.5% for Kisan Credit Cards. Compare multiple crop insurance plans including PM Fasal Bima Yojana (2% premium) and Weather-Based Insurance (3.5% premium). Applications are submitted directly to financial institutions with real-time status tracking.</p>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6><i class="fas fa-money-bill-wave"></i> Loan Services</h6>
+                                        <div class="card bg-light mb-3">
+                                            <div class="card-body">
+                                                <h5>Your Eligibility</h5>
+                                                <p><strong>Status:</strong> <span class="badge bg-{{ 'success' if loan_data.eligible else 'warning' }}">{{ 'Eligible' if loan_data.eligible else 'Not Eligible' }}</span></p>
+                                                <p><strong>Max Loan Amount:</strong> ₹{{ loan_data.max_amount }}</p>
+                                                <p><strong>Interest Rate:</strong> {{ loan_data.interest_rate }}% per annum</p>
+                                                <button class="btn btn-success" onclick="applyForLoan()" {{ 'disabled' if not loan_data.eligible else '' }}>Apply for Loan</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6><i class="fas fa-shield-alt"></i> Insurance Plans</h6>
+                                        {% for plan in insurance_plans[:2] %}
+                                        <div class="card bg-light mb-2">
+                                            <div class="card-body">
+                                                <h6>{{ plan.name }}</h6>
+                                                <p class="mb-1"><strong>Premium:</strong> {{ plan.premium_rate }}% of sum insured</p>
+                                                <p class="mb-2"><small>{{ plan.coverage }}</small></p>
+                                                <button class="btn btn-primary btn-sm" onclick="getInsuranceQuote('{{ plan.name }}')">Get Quote</button>
+                                            </div>
+                                        </div>
+                                        {% else %}
+                                        <div class="alert alert-secondary mb-0">Insurance plans are not available right now.</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Video Library -->
+                <div class="row mb-4" id="video-library">
+                    <div class="col-12">
+                        <div class="card shadow-lg border-danger" style="border-width: 2px;">
+                            <div class="card-header bg-danger text-white">
+                                <h5 class="mb-0"><i class="fas fa-video me-2"></i> Video Learning Library</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-light border-danger">
+                                    <p class="mb-0"><strong>Video Learning Library</strong> offers curated educational content from agricultural experts and successful farmers. Watch short 2-5 minute videos covering modern irrigation techniques, organic farming methods, government scheme tutorials, and equipment operation guides. Videos are available in multiple regional languages with subtitles. Track your learning progress and bookmark favorites for later viewing.</p>
+                                </div>
+                                <div class="row">
+                                    {% for video in videos[:3] %}
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <i class="fas fa-play-circle fa-3x text-danger mb-2"></i>
+                                                <h6>{{ video.title }}</h6>
+                                                <small class="text-muted">Duration: {{ (video.duration // 60) if video.duration else 3 }} min | Views: {{ video.views if video.views else 0 }}</small><br>
+                                                <button class="btn btn-danger btn-sm mt-2" onclick="watchVideo({{ video.id if video.id else loop.index }}, '{{ video.title }}')">Watch Now</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="col-12">
+                                        <div class="alert alert-secondary mb-0">No videos found. New learning videos will appear here.</div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <button class="btn btn-danger" onclick="viewAllVideos()"><i class="fas fa-th"></i> View All Videos</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- WASTE MANAGEMENT SECTION - INTEGRATED -->
+                <div class="row mb-4" id="waste-management-section">
+                    <div class="col-12">
+                        <div class="card shadow-lg border-success" style="border-width: 3px;">
+                            <div class="card-header bg-success text-white">
+                                <h3 class="mb-0"><i class="fas fa-recycle me-2"></i>Waste Management & Zero-Waste Agriculture</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info mb-4">
+                                    <h5><i class="fas fa-info-circle"></i> Smart Waste Management</h5>
+                                    <p class="mb-0">Based on your recommended crop <strong>{{ crop_recommendations.top_3[0].crop|title }}</strong> with predicted yield of <strong>{{ "{:,.0f}".format(predicted_yield) }} kg</strong>, we've automatically calculated your crop residue and management options. No manual input needed!</p>
+                                </div>
+
+                                <!-- Auto-calculated Stats -->
+                                <div class="row mb-4">
+                                    <div class="col-md-3">
+                                        <div class="card bg-light text-center">
+                                            <div class="card-body">
+                                                <i class="fas fa-wheat-awn fa-2x text-success mb-2"></i>
+                                                <h4 id="autoResidue">-</h4>
+                                                <small>Crop Residue (kg)</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card bg-light text-center">
+                                            <div class="card-body">
+                                                <i class="fas fa-seedling fa-2x text-success mb-2"></i>
+                                                <h4 id="autoCompost">-</h4>
+                                                <small>Compost Output (kg)</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card bg-light text-center">
+                                            <div class="card-body">
+                                                <i class="fas fa-coins fa-2x text-warning mb-2"></i>
+                                                <h4>₹<span id="autoRevenue">-</span></h4>
+                                                <small>Potential Revenue</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card bg-light text-center">
+                                            <div class="card-body">
+                                                <i class="fas fa-leaf fa-2x text-success mb-2"></i>
+                                                <h4 id="autoCarbon">-</h4>
+                                                <small>CO₂ Saved (tons)</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Management Options -->
+                                <h5 class="mb-3"><i class="fas fa-lightbulb"></i> Recommended Waste Management Options</h5>
+                                <div class="row" id="autoManagementOptions">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card h-100 border-success">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-seedling fa-3x text-success mb-3"></i>
+                                                <h5>Composting</h5>
+                                                <div class="mb-2">
+                                                    <strong id="optCompostOutput">-</strong> kg compost
+                                                </div>
+                                                <h4 class="text-success">₹<span id="optCompostRevenue">-</span></h4>
+                                                <small class="text-muted">60 days process</small>
+                                                <hr>
+                                                <p class="small mb-0">Convert residue into organic fertilizer worth ₹5/kg</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card h-100 border-warning">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-fire fa-3x text-warning mb-3"></i>
+                                                <h5>Biogas</h5>
+                                                <div class="mb-2">
+                                                    <strong id="optBiogasVolume">-</strong> m³ gas
+                                                </div>
+                                                <h4 class="text-success">₹<span id="optBiogasSavings">-</span></h4>
+                                                <small class="text-muted">30 days process</small>
+                                                <hr>
+                                                <p class="small mb-0">Generate cooking gas + bio-slurry fertilizer</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card h-100 border-info">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-cow fa-3x text-info mb-3"></i>
+                                                <h5>Cattle Feed</h5>
+                                                <div class="mb-2">
+                                                    Sell as animal feed
+                                                </div>
+                                                <h4 class="text-success">₹<span id="optCattleRevenue">-</span></h4>
+                                                <small class="text-muted">Immediate sale</small>
+                                                <hr>
+                                                <p class="small mb-0">Quick cash at ₹3.5/kg</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card h-100 border-danger">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-mushroom fa-3x text-danger mb-3"></i>
+                                                <h5>Mushroom</h5>
+                                                <div class="mb-2">
+                                                    <strong id="optMushroomYield">-</strong> kg
+                                                </div>
+                                                <h4 class="text-success">₹<span id="optMushroomRevenue">-</span></h4>
+                                                <small class="text-muted" id="optMushroomNote">45 days</small>
+                                                <hr>
+                                                <p class="small mb-0" id="optMushroomDesc">High-value crop at ₹180/kg</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Environmental Impact -->
+                                <div class="alert alert-success mt-4">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <h5><i class="fas fa-leaf"></i> Environmental Impact</h5>
+                                            <p class="mb-0">By not burning crop residue, you save <strong id="envCarbon">-</strong> tons of CO₂ emissions, worth approximately <strong>₹<span id="envCarbonValue">-</span></strong> in carbon credits. You also improve soil health and reduce air pollution.</p>
+                                        </div>
+                                        <div class="col-md-4 text-center">
+                                            <i class="fas fa-globe-asia fa-4x text-success"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Quick Tips -->
+                                <div class="card bg-light mt-4">
+                                    <div class="card-body">
+                                        <h5><i class="fas fa-lightbulb"></i> Quick Tips for Zero-Waste Farming</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <ul>
+                                                    <li>Mix crop residue with kitchen waste for better compost</li>
+                                                    <li>Use vermicompost for high-value crops</li>
+                                                    <li>Store dry residue for mushroom cultivation</li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <ul>
+                                                    <li>Biogas slurry is excellent organic fertilizer</li>
+                                                    <li>Sell excess compost to nearby farmers</li>
+                                                    <li>Never burn - it's illegal and harmful</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Smart Recommendations Section -->
+                <div class="row mb-4" id="smart-recommendations">
+                    <div class="col-12">
+                        <div class="card shadow-lg border-warning" style="border-width: 2px;">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i> Smart Recommendations & Actionable Advice</h5>
+                            </div>
+                            <div class="card-body">
+                                {% if smart_recommendations %}
+                                <div class="row">
+                                    {% for rec in smart_recommendations %}
+                                    <div class="col-md-6 mb-3">
+                                        <div class="alert alert-{% if rec.priority == 'High' %}danger{% elif rec.priority == 'Medium' %}warning{% else %}info{% endif %} mb-0">
+                                            <h6><i class="fas fa-{{ rec.icon }} me-2"></i><strong>{{ rec.category }}:</strong> {{ rec.issue }}</h6>
+                                            <p class="mb-1">{{ rec.recommendation }}</p>
+                                            <span class="badge bg-{% if rec.priority == 'High' %}danger{% elif rec.priority == 'Medium' %}warning text-dark{% else %}info{% endif %}">{{ rec.priority }} Priority</span>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle me-2"></i> All parameters are optimal. No immediate actions required.
+                                </div>
+                                {% endif %}
+                                <!-- Export Options -->
+                                <hr>
+                                <h6><i class="fas fa-download me-2"></i> Export & Reports</h6>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <a href="/generate_report" class="btn btn-danger btn-sm"><i class="fas fa-file-pdf me-1"></i> Download PDF Report</a>
+                                    <a href="/api/analytics/export" class="btn btn-success btn-sm"><i class="fas fa-file-csv me-1"></i> Export CSV</a>
+                                    <a href="/analytics" class="btn btn-primary btn-sm"><i class="fas fa-chart-bar me-1"></i> View Analytics</a>
+                                    <a href="/prediction-history" class="btn btn-info btn-sm"><i class="fas fa-history me-1"></i> Prediction History</a>
+                                    <a href="/crop-comparison" class="btn btn-warning btn-sm"><i class="fas fa-balance-scale me-1"></i> Compare Crops</a>
+                                    <a href="/risk-analysis" class="btn btn-secondary btn-sm"><i class="fas fa-exclamation-triangle me-1"></i> Risk Analysis</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                <div class="row section-controls">
+                    <div class="col-12 mb-2">
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-success btn-sm" data-bs-toggle="collapse" data-bs-target="#schemes" type="button">Toggle Schemes</button>
+                            <button class="btn btn-outline-success btn-sm" data-bs-toggle="collapse" data-bs-target="#calendar" type="button">Toggle Calendar</button>
+                            <button class="btn btn-outline-success btn-sm" data-bs-toggle="collapse" data-bs-target="#storage" type="button">Toggle Storage Tips</button>
+                            <button class="btn btn-outline-success btn-sm" data-bs-toggle="collapse" data-bs-target="#helpline" type="button">Toggle Helpline</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row collapse secondary-collapsible" id="schemes">
+                    <div class="col-12">
+                        <div class="card shadow-lg">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-landmark me-2"></i> Government Schemes for Farmers</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    {% for scheme in govt_schemes %}
+                                    <div class="col-md-6">
+                                        <div class="card h-100 border-primary" style="border-width: 2px;">
+                                            <div class="card-body">
+                                                <h6 class="text-primary fw-bold">{{ scheme.name }}</h6>
+                                                <p class="mb-2"><strong>Benefit:</strong> {{ scheme.benefit }}</p>
+                                                <p class="mb-0 text-muted"><small><strong>Eligibility:</strong> {{ scheme.eligibility }}</small></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="col-12">
+                                        <div class="alert alert-secondary mb-0">No government schemes data available right now.</div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row collapse secondary-collapsible" id="calendar">
+                    <div class="col-12">
+                        <div class="card shadow-lg">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i> Crop Calendar</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    {% for season, data in crop_calendar.items() %}
+                                    <div class="col-md-4">
+                                        <div class="card bg-light h-100">
+                                            <div class="card-body text-center">
+                                                <h5 class="text-success mb-3">{{ season }} Season</h5>
+                                                <p class="mb-2"><i class="fas fa-clock me-2"></i><strong>{{ data.season }}</strong></p>
+                                                <hr>
+                                                <p class="mb-0"><strong>Crops:</strong><br>{{ data.crops }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="col-12">
+                                        <div class="alert alert-secondary mb-0">Crop calendar data is currently unavailable.</div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row collapse secondary-collapsible" id="storage">
+                    <div class="col-12">
+                        <div class="card shadow-lg">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-warehouse me-2"></i> Crop Storage Tips</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group">
+                                    {% for tip in storage_tips %}
+                                    <li class="list-group-item">
+                                        <i class="fas fa-check-circle text-success me-2"></i>{{ tip }}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="chatbot">
+                    <div class="col-12">
+                        <div class="card shadow-lg border-primary" style="border-width: 2px;">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-robot me-2"></i> AI Farming Assistant</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chat-container" style="height: 400px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; background: #f8fafc;" id="chatMessages">
+                                    <div class="alert alert-info"><strong>AI:</strong> Hello! Ask me anything about farming!</div>
+                                </div>
+                                <div class="input-group mt-3">
+                                    <input type="text" class="form-control" id="chatInput" placeholder="Ask about farming..." onkeypress="if(event.key==='Enter') sendChat()">
+                                    <button class="btn btn-primary" onclick="sendChat()"><i class="fas fa-paper-plane"></i> Send</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Helpline Section -->
+                <div class="row mb-4 collapse secondary-collapsible" id="helpline">
+                    <div class="col-12">
+                        <div class="card shadow-lg border-warning" style="border-width: 2px;">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0"><i class="fas fa-phone-alt me-2"></i> Farmer Helpline Numbers</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    {% for helpline in helplines %}
+                                    <div class="col-md-4">
+                                        <div class="card bg-light h-100">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-headset fa-2x text-warning mb-3"></i>
+                                                <h6 class="fw-bold">{{ helpline.name }}</h6>
+                                                <h4 class="text-primary mb-2">{{ helpline.number }}</h4>
+                                                <small class="text-muted">{{ helpline.service }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="col-12">
+                                        <div class="alert alert-secondary mb-0">No helpline records available.</div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Documentation Section -->
+                <div class="row mb-4" id="documentation">
+                    <div class="col-12">
+                        <div class="card shadow-lg border-dark" style="border-width: 2px;">
+                            <div class="card-header bg-dark text-white">
+                                <h5 class="mb-0"><i class="fas fa-book me-2"></i> Documentation & Help</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="card h-100 border-primary">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-info-circle fa-3x text-primary mb-3"></i>
+                                                <h6>System Overview</h6>
+                                                <p class="small">Learn about all 19 features of the platform</p>
+                                                <button class="btn btn-primary btn-sm" onclick="openDocumentation('overview')">Read More</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card h-100 border-success">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-user-guide fa-3x text-success mb-3"></i>
+                                                <h6>User Guide</h6>
+                                                <p class="small">Step-by-step instructions for each feature</p>
+                                                <button class="btn btn-success btn-sm" onclick="openDocumentation('user-guide')">View Guide</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card h-100 border-warning">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-question-circle fa-3x text-warning mb-3"></i>
+                                                <h6>FAQ & Support</h6>
+                                                <p class="small">Common questions and troubleshooting</p>
+                                                <button class="btn btn-warning btn-sm" onclick="openDocumentation('faq')">Get Help</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <h6>Quick Links</h6>
+                                    <ul class="list-group">
+                                        <li class="list-group-item"><i class="fas fa-check text-success"></i> How to use Crop Recommendation</li>
+                                        <li class="list-group-item"><i class="fas fa-check text-success"></i> Understanding Market Prices</li>
+                                        <li class="list-group-item"><i class="fas fa-check text-success"></i> Setting up SMS Alerts</li>
+                                        <li class="list-group-item"><i class="fas fa-check text-success"></i> Using the Marketplace</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+    <!-- Audio element for voice playback -->
+    <audio id="audioPlayer" controls style="display: none;"></audio>
+<script>
+const chartData = {{ chart_data|tojson }};
+const forecastData = {{ forecast|tojson }};
+const soilData = {{ soil_data|tojson }};
+const marketLabels = {{ market_prices.keys()|list|tojson }};
+</script>
+<script>
+const sustainabilityData = {{ sustainability_data|tojson }};
+</script>
+    <!-- Scroll Spy Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('.row[id]');
+            const navLinks = document.querySelectorAll('.list-group-item[href^="#"]');
+            const linkMap = new Map();
+            navLinks.forEach(link => {
+                const id = link.getAttribute('href').slice(1);
+                if (id) {
+                    linkMap.set(id, link);
+                }
+            });
+            function activateLink(id) {
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+                if (id && linkMap.has(id)) linkMap.get(id).classList.add('active');
+            }
+            // Smooth sidebar navigation with robust active-state updates.
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const targetId = this.getAttribute('href').slice(1);
+                    const target = document.getElementById(targetId);
+                    if (!target) return;
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    activateLink(targetId);
+                });
+            });
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    let activeId = null;
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            activeId = entry.target.id;
+                        }
+                    });
+                    if (activeId) activateLink(activeId);
+                }, {
+                    root: null,
+                    rootMargin: '-35% 0px -55% 0px',
+                    threshold: [0.1, 0.25, 0.5]
+                });
+                sections.forEach(section => observer.observe(section));
+            } else {
+                function onScrollFallback() {
+                    let currentId = sections[0] ? sections[0].id : '';
+                    sections.forEach(section => {
+                        const top = section.getBoundingClientRect().top;
+                        if (top <= 140) currentId = section.id;
+                    });
+                    activateLink(currentId);
+                }
+                window.addEventListener('scroll', onScrollFallback);
+                onScrollFallback();
+            }
+        });
+    </script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/new_features.js', v='20260308i') }}"></script>
+    <script src="{{ url_for('static', filename='js/language.js', v='20260308i') }}"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js', v='20260308i') }}"></script>
+    <script src="{{ url_for('static', filename='js/voice.js', v='20260308i') }}"></script>
+    <script src="{{ url_for('static', filename='js/charts.js', v='20260308i') }}"></script>
+    <script src="{{ url_for('static', filename='js/features.js', v='20260308i') }}"></script>
+    <script>
+        // Auto-calculate waste management based on crop data
+        document.addEventListener('DOMContentLoaded', function() {
+            const cropName = '{{ crop_recommendations.top_3[0].crop|lower }}';
+            const predictedYield = {{ predicted_yield }};
+            
+            // Residue ratios for different crops
+            const residueRatios = {
+                'rice': 1.5, 'wheat': 1.3, 'maize': 1.0, 'cotton': 2.5,
+                'sugarcane': 0.3, 'chickpea': 1.5, 'soybean': 1.5
+            };
+            
+            const ratio = residueRatios[cropName] || 1.2;
+            const residueKg = predictedYield * ratio;
+            
+            // Calculate management options
+            const compostOutput = residueKg * 0.4;
+            const compostRevenue = compostOutput * 5;
+            
+            const biogasVolume = residueKg * 0.3;
+            const biogasSavings = (biogasVolume / 1.5) * 900;
+            
+            const cattleRevenue = residueKg * 3.5;
+            
+            const mushroomApplicable = ['rice', 'wheat'].includes(cropName);
+            const mushroomYield = mushroomApplicable ? residueKg * 0.15 : 0;
+            const mushroomRevenue = mushroomYield * 180;
+            
+            const carbonSaved = residueKg * 0.0015;
+            const carbonValue = carbonSaved * 1500;
+            
+            const bestRevenue = Math.max(compostRevenue, biogasSavings, cattleRevenue, mushroomRevenue);
+            
+            // Update UI
+            document.getElementById('autoResidue').textContent = residueKg.toFixed(0);
+            document.getElementById('autoCompost').textContent = compostOutput.toFixed(0);
+            document.getElementById('autoRevenue').textContent = bestRevenue.toFixed(0);
+            document.getElementById('autoCarbon').textContent = carbonSaved.toFixed(2);
+            
+            document.getElementById('optCompostOutput').textContent = compostOutput.toFixed(0);
+            document.getElementById('optCompostRevenue').textContent = compostRevenue.toFixed(0);
+            
+            document.getElementById('optBiogasVolume').textContent = biogasVolume.toFixed(1);
+            document.getElementById('optBiogasSavings').textContent = biogasSavings.toFixed(0);
+            
+            document.getElementById('optCattleRevenue').textContent = cattleRevenue.toFixed(0);
+            
+            document.getElementById('optMushroomYield').textContent = mushroomYield.toFixed(0);
+            document.getElementById('optMushroomRevenue').textContent = mushroomRevenue.toFixed(0);
+            
+            if (!mushroomApplicable) {
+                document.getElementById('optMushroomNote').textContent = 'Not suitable';
+                document.getElementById('optMushroomDesc').textContent = 'Only for rice/wheat straw';
+            }
+            
+            document.getElementById('envCarbon').textContent = carbonSaved.toFixed(2);
+            document.getElementById('envCarbonValue').textContent = carbonValue.toFixed(0);
+        });
+    </script>
+    <script>
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() { initializeCharts(true); console.log("Charts forced to render"); }, 500);
+            loadCropMonitoring();
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    document.body.classList.toggle('sidebar-collapsed');
+                });
+            }
+            const themeToggle = document.getElementById('themeToggle');
+            const storedTheme = localStorage.getItem('dashboardTheme');
+            if (storedTheme === 'dark') {
+                document.body.classList.add('theme-dark');
+            }
+            if (themeToggle) {
+                const icon = themeToggle.querySelector('i');
+                if (icon) icon.className = document.body.classList.contains('theme-dark') ? 'fas fa-sun' : 'fas fa-moon';
+            }
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    document.body.classList.toggle('theme-dark');
+                    const icon = themeToggle.querySelector('i');
+                    if (icon) icon.className = document.body.classList.contains('theme-dark') ? 'fas fa-sun' : 'fas fa-moon';
+                    localStorage.setItem('dashboardTheme', document.body.classList.contains('theme-dark') ? 'dark' : 'light');
+                });
+            }
+            const irrigationFilter = document.getElementById('irrigationFilter');
+            const irrigationTable = document.getElementById('irrigationTable');
+            if (irrigationFilter && irrigationTable) {
+                irrigationFilter.addEventListener('input', function() {
+                    const q = this.value.toLowerCase().trim();
+                    irrigationTable.querySelectorAll('tbody tr').forEach(row => {
+                        row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+                    });
+                });
+            }
+            const compactBtn = document.getElementById('toggleCompactMode');
+            if (compactBtn) {
+                compactBtn.addEventListener('click', function() {
+                    document.body.classList.toggle('compact-mode');
+                });
+            }
+            document.querySelectorAll('.list-group-item[href^="#"]').forEach(link => {
+                link.addEventListener('click', function() {
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target && target.classList.contains('collapse') && !target.classList.contains('show')) {
+                        bootstrap.Collapse.getOrCreateInstance(target).show();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

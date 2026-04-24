@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Dashboard Data</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #0f0; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #0f0; }
+        .good { color: #0f0; }
+        .bad { color: #f00; }
+        pre { background: #000; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Dashboard Data Debug</h1>
+    
+    <div class="section">
+        <h2>1. Checking ML Model</h2>
+        <pre id="model-check">Loading...</pre>
+    </div>
+    
+    <div class="section">
+        <h2>2. Checking Profit Calculation</h2>
+        <pre id="profit-check">Loading...</pre>
+    </div>
+    
+    <div class="section">
+        <h2>3. Checking Chart Data</h2>
+        <pre id="chart-check">Loading...</pre>
+    </div>
+    
+    <div class="section">
+        <h2>4. Checking CSS Files</h2>
+        <pre id="css-check">Loading...</pre>
+    </div>
+    
+    <div class="section">
+        <h2>5. Checking JavaScript Files</h2>
+        <pre id="js-check">Loading...</pre>
+    </div>
+    
+    <script>
+        // Check model
+        fetch('/api/debug/model')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('model-check').innerHTML = JSON.stringify(data, null, 2);
+                document.getElementById('model-check').className = data.confidence > 90 ? 'good' : 'bad';
+            })
+            .catch(e => {
+                document.getElementById('model-check').innerHTML = 'ERROR: ' + e;
+                document.getElementById('model-check').className = 'bad';
+            });
+        
+        // Check profit
+        fetch('/api/debug/profit')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('profit-check').innerHTML = JSON.stringify(data, null, 2);
+                document.getElementById('profit-check').className = data.profit > 0 ? 'good' : 'bad';
+            })
+            .catch(e => {
+                document.getElementById('profit-check').innerHTML = 'ERROR: ' + e;
+                document.getElementById('profit-check').className = 'bad';
+            });
+        
+        // Check chart data
+        fetch('/api/debug/chartdata')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('chart-check').innerHTML = JSON.stringify(data, null, 2);
+                document.getElementById('chart-check').className = 'good';
+            })
+            .catch(e => {
+                document.getElementById('chart-check').innerHTML = 'ERROR: ' + e;
+                document.getElementById('chart-check').className = 'bad';
+            });
+        
+        // Check CSS
+        const cssCheck = document.getElementById('css-check');
+        const cssFiles = [
+            '/static/css/dashboard-pro.css',
+            '/static/css/dark-mode-fixes.css'
+        ];
+        
+        Promise.all(cssFiles.map(url => 
+            fetch(url).then(r => ({ url, status: r.status, ok: r.ok }))
+        )).then(results => {
+            cssCheck.innerHTML = results.map(r => 
+                `${r.url}: ${r.ok ? 'OK ✓' : 'MISSING ✗'}`
+            ).join('\\n');
+            cssCheck.className = results.every(r => r.ok) ? 'good' : 'bad';
+        });
+        
+        // Check JS
+        const jsCheck = document.getElementById('js-check');
+        const jsFiles = [
+            '/static/js/charts.js',
+            '/static/js/dashboard.js'
+        ];
+        
+        Promise.all(jsFiles.map(url => 
+            fetch(url).then(r => ({ url, status: r.status, ok: r.ok }))
+        )).then(results => {
+            jsCheck.innerHTML = results.map(r => 
+                `${r.url}: ${r.ok ? 'OK ✓' : 'MISSING ✗'}`
+            ).join('\\n');
+            jsCheck.className = results.every(r => r.ok) ? 'good' : 'bad';
+        });
+    </script>
+</body>
+</html>

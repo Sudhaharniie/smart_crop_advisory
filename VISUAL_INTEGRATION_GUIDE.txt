@@ -1,0 +1,165 @@
+
+================================================================================
+VISUAL GUIDE: WHERE TO ADD CODE IN APP.PY
+================================================================================
+
+YOUR APP.PY STRUCTURE:
+┌────────────────────────────────────────────────────────────────────────────┐
+│ from flask import Flask...                                                │
+│ import statements...                                                       │
+│                                                                            │
+│ app = Flask(__name__)                                                      │
+│ db = SQLAlchemy(app)                                                       │
+│                                                                            │
+│ class User(db.Model):                                                      │
+│     ...                                                                    │
+│                                                                            │
+│ class CropData(db.Model):                                                  │
+│     ...                                                                    │
+│                                                                            │
+│ ... (more existing models) ...                                            │
+│                                                                            │
+│ class Notification(db.Model):                                              │
+│     id = db.Column(db.Integer, primary_key=True)                           │
+│     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))             │
+│     title = db.Column(db.String(100), nullable=False)                      │
+│     message = db.Column(db.String(200), nullable=False)                    │
+│     icon = db.Column(db.String(50), default='bell')                        │
+│     color = db.Column(db.String(20), default='info')                       │
+│     is_read = db.Column(db.Boolean, default=False)                         │
+│     created_at = db.Column(db.DateTime, default=datetime.utcnow)           │
+│                                                                            │
+├─────────────────────────────────────────────────────────────────────────────
+│ ⭐ ADD 7 NEW MODELS HERE ⭐                                                │
+│                                                                            │
+│ class Alert(db.Model):                                                     │
+│     ... (copy from INTEGRATION_STEPS.py)                                  │
+│                                                                            │
+│ class MarketplaceListing(db.Model):                                        │
+│     ... (copy from INTEGRATION_STEPS.py)                                  │
+│                                                                            │
+│ class DiseaseDetection(db.Model):                                          │
+│     ... (copy from INTEGRATION_STEPS.py)                                  │
+│                                                                            │
+│ class LoanApplication(db.Model):                                           │
+│     ... (copy from INTEGRATION_STEPS.py)                                  │
+│                                                                            │
+│ class Insurance(db.Model):                                                 │
+│     ... (copy from INTEGRATION_STEPS.py)                                  │
+│                                                                            │
+│ class VideoLibrary(db.Model):                                              │
+│     ... (copy from INTEGRATION_STEPS.py)                                  │
+│                                                                            │
+│ class VideoProgress(db.Model):                                             │
+│     ... (copy from INTEGRATION_STEPS.py)                                  │
+├─────────────────────────────────────────────────────────────────────────────
+│                                                                            │
+│ # Weather API Integration                                                 │
+│ def get_weather_data(location):                                            │
+│     ...                                                                    │
+│                                                                            │
+│ ... (all your existing functions) ...                                     │
+│                                                                            │
+│ # Routes                                                                   │
+│ @app.route('/')                                                            │
+│ def index():                                                               │
+│     ...                                                                    │
+│                                                                            │
+│ ... (all your existing routes) ...                                        │
+│                                                                            │
+│ @app.route('/logout')                                                      │
+│ def logout():                                                              │
+│     session.clear()                                                        │
+│     return redirect(url_for('login'))                                      │
+│                                                                            │
+├─────────────────────────────────────────────────────────────────────────────
+│ ⭐ ADD 3 NEW ROUTES HERE ⭐                                                │
+│                                                                            │
+│ @app.route('/api/test_new_features')                                       │
+│ def test_new_features():                                                   │
+│     ... (copy from INTEGRATION_STEPS.py)                                  │
+│                                                                            │
+│ @app.route('/api/videos/library')                                          │
+│ def video_library():                                                       │
+│     ... (copy from INTEGRATION_STEPS.py)                                  │
+│                                                                            │
+│ @app.route('/api/marketplace/listings')                                    │
+│ def get_marketplace_listings():                                            │
+│     ... (copy from INTEGRATION_STEPS.py)                                  │
+├─────────────────────────────────────────────────────────────────────────────
+│                                                                            │
+│ # Initialize database                                                     │
+│ with app.app_context():                                                    │
+│     db.create_all()                                                        │
+│                                                                            │
+│ if __name__ == '__main__':                                                 │
+│     app.run(debug=True, host='0.0.0.0', port=5000)                         │
+└────────────────────────────────────────────────────────────────────────────┘
+
+
+================================================================================
+STEP-BY-STEP INSTRUCTIONS
+================================================================================
+
+STEP 1: Open app.py in your text editor
+
+STEP 2: Find "class Notification(db.Model):" (around line 100)
+        Scroll to the end of this class
+        Press Enter to create a new line
+        Paste the 7 models from INTEGRATION_STEPS.py
+
+STEP 3: Scroll to bottom of app.py
+        Find "if __name__ == '__main__':" (around line 900)
+        Go UP a few lines to find "@app.route('/logout')"
+        After the logout function, press Enter twice
+        Paste the 3 routes from INTEGRATION_STEPS.py
+
+STEP 4: Save app.py
+
+STEP 5: Run: python add_sample_data.py
+
+STEP 6: Run: python app.py
+
+STEP 7: Test: http://localhost:5000/api/test_new_features
+
+
+================================================================================
+WHAT TO COPY
+================================================================================
+
+FROM INTEGRATION_STEPS.py, copy TWO sections:
+
+SECTION 1 (Models) - Lines showing:
+  class Alert(db.Model):
+  class MarketplaceListing(db.Model):
+  class DiseaseDetection(db.Model):
+  class LoanApplication(db.Model):
+  class Insurance(db.Model):
+  class VideoLibrary(db.Model):
+  class VideoProgress(db.Model):
+
+SECTION 2 (Routes) - Lines showing:
+  @app.route('/api/test_new_features')
+  @app.route('/api/videos/library')
+  @app.route('/api/marketplace/listings')
+
+
+================================================================================
+VERIFICATION
+================================================================================
+
+After integration, your app.py should have:
+✓ 16 database models (9 old + 7 new)
+✓ 40+ routes (37 old + 3 new)
+✓ Same structure, just more features!
+
+Test URLs:
+✓ http://localhost:5000/api/test_new_features
+✓ http://localhost:5000/api/videos/library
+✓ http://localhost:5000/api/marketplace/listings
+
+
+================================================================================
+DONE! FEATURES ARE NOW VISIBLE!
+================================================================================
+

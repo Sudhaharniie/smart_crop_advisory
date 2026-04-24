@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agricultural Advisory Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/scroll-spy.css') }}">
+</head>
+<body>
+    
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <h3 style="color: white; padding: 0 20px;">Dashboard</h3>
+        <nav>
+            <a href="#weather"><i class="fas fa-cloud"></i> Weather</a>
+            <a href="#crop-recommendation"><i class="fas fa-seedling"></i> Crop Recommendation</a>
+            <a href="#soil-analysis"><i class="fas fa-leaf"></i> Soil Analysis</a>
+            <a href="#market-prices"><i class="fas fa-chart-line"></i> Market Prices</a>
+            <a href="#irrigation"><i class="fas fa-tint"></i> Irrigation</a>
+            <a href="#sustainability"><i class="fas fa-recycle"></i> Sustainability</a>
+            <a href="#expenses"><i class="fas fa-wallet"></i> Expenses</a>
+            <a href="#equipment"><i class="fas fa-tractor"></i> Equipment</a>
+            <a href="#labor"><i class="fas fa-users"></i> Labor</a>
+            <a href="#notifications"><i class="fas fa-bell"></i> Notifications</a>
+            <a href="#schemes"><i class="fas fa-file-alt"></i> Govt Schemes</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <!-- Weather Section -->
+        <section id="weather" class="dashboard-section">
+            <h2>Weather Forecast</h2>
+            <div class="weather-card">
+                <!-- Your weather content here -->
+                <p>Temperature: {{ weather.temperature }}°C</p>
+                <p>Humidity: {{ weather.humidity }}%</p>
+            </div>
+        </section>
+
+        <!-- Crop Recommendation Section -->
+        <section id="crop-recommendation" class="dashboard-section">
+            <h2>Crop Recommendation</h2>
+            <div class="crop-card">
+                <!-- Your crop recommendation content -->
+                <p>Recommended Crop: {{ crop_recommendations.recommended_crop }}</p>
+                <p>Confidence: {{ crop_recommendations.confidence }}%</p>
+            </div>
+        </section>
+
+        <!-- Soil Analysis Section -->
+        <section id="soil-analysis" class="dashboard-section">
+            <h2>Soil Analysis</h2>
+            <div class="soil-card">
+                <!-- Your soil analysis content -->
+                <p>pH: {{ soil_data.ph }}</p>
+                <p>Nitrogen: {{ soil_data.nitrogen }}</p>
+            </div>
+        </section>
+
+        <!-- Market Prices Section -->
+        <section id="market-prices" class="dashboard-section">
+            <h2>Market Prices</h2>
+            <div class="market-card">
+                <!-- Your market prices content -->
+                {% for crop, data in market_prices.items() %}
+                <p>{{ crop }}: ₹{{ data.current_price }}</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Irrigation Section -->
+        <section id="irrigation" class="dashboard-section">
+            <h2>Irrigation Schedule</h2>
+            <div class="irrigation-card">
+                <!-- Your irrigation content -->
+                {% for advice in irrigation_advice %}
+                <p>{{ advice }}</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Sustainability Section -->
+        <section id="sustainability" class="dashboard-section">
+            <h2>Sustainability Metrics</h2>
+            <div class="sustainability-card">
+                <!-- Your sustainability content -->
+                <p>Water Efficiency: {{ sustainability_data.water_usage_efficiency }}%</p>
+            </div>
+        </section>
+
+        <!-- Expenses Section -->
+        <section id="expenses" class="dashboard-section">
+            <h2>Expense Tracker</h2>
+            <div class="expense-card">
+                <!-- Your expense content -->
+                <p>Total Income: ₹{{ expenses.total_income }}</p>
+                <p>Total Expense: ₹{{ expenses.total_expense }}</p>
+            </div>
+        </section>
+
+        <!-- Equipment Section -->
+        <section id="equipment" class="dashboard-section">
+            <h2>Equipment Rental</h2>
+            <div class="equipment-card">
+                <!-- Your equipment content -->
+                {% for eq in equipment %}
+                <p>{{ eq.name }}: ₹{{ eq.rate }}/{{ eq.unit }}</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Labor Section -->
+        <section id="labor" class="dashboard-section">
+            <h2>Labor Management</h2>
+            <div class="labor-card">
+                <!-- Your labor content -->
+                <p>Workers Present: {{ labor.present }}</p>
+                <p>Total Wages: ₹{{ labor.total_wages }}</p>
+            </div>
+        </section>
+
+        <!-- Notifications Section -->
+        <section id="notifications" class="dashboard-section">
+            <h2>Notifications</h2>
+            <div class="notification-card">
+                <!-- Your notifications content -->
+                {% for notif in notifications %}
+                <p>{{ notif.title }}: {{ notif.message }}</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Government Schemes Section -->
+        <section id="schemes" class="dashboard-section">
+            <h2>Government Schemes</h2>
+            <div class="schemes-card">
+                <!-- Your schemes content -->
+                {% for scheme in govt_schemes %}
+                <p>{{ scheme.name }}: {{ scheme.benefit }}</p>
+                {% endfor %}
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://kit.fontawesome.com/your-kit.js"></script>
+    <script src="{{ url_for('static', filename='js/scroll-spy.js') }}"></script>
+</body>
+</html>
